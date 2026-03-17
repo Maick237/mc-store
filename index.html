@@ -1220,6 +1220,13 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
         <button class="btn-gold" style="margin-top:14px" onclick="changePassword()">🔐 Changer le mot de passe</button>
       </div>
 
+      <!-- RESET -->
+      <div class="acard" style="border-color:rgba(140,32,32,0.3)">
+        <h3 style="color:#FF8888">⚠️ Réinitialiser la boutique</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Supprime tous les produits, commandes et paramètres sauvegardés. Action irréversible.</p>
+        <button onclick="clearStorage()" style="padding:10px 20px;background:transparent;border:1px solid rgba(140,32,32,0.4);color:#FF8888;border-radius:var(--r);font-family:var(--fb);font-size:13px;cursor:pointer">🗑️ Tout réinitialiser</button>
+      </div>
+
     </div>
   </div>
 </div>
@@ -1493,7 +1500,7 @@ function submitReview(){
   const avg=getAvgRating(curDetail.reviews);
   document.getElementById('dStars').textContent=starsHTML(avg>0?Math.round(avg):5);
   document.getElementById('dRatingCount').textContent=`${curDetail.reviews.length} avis`;
-  toast('Avis publié ✓');
+  toast('Avis publié ✓');autoSave();
 }
 
 function renderProductReviews(){
@@ -1543,7 +1550,7 @@ function submitSiteRating(){
   selectedSiteRating=0;
   document.querySelectorAll('.star-sel-btn').forEach(b=>b.classList.remove('active'));
   renderSiteReviews();
-  toast('Merci pour votre avis ! ✓');
+  toast('Merci pour votre avis ! ✓');autoSave();
 }
 
 function renderSiteReviews(){
@@ -1729,6 +1736,7 @@ function confirmOrder(){
   sendWAOrder(order);
   cart={};appliedCoupon=null;updateBadge();
   if(isAdmin)updateOrdersBadge();
+  autoSave();
   document.getElementById('sucNum').textContent=num;
   document.getElementById('sucMsg').innerHTML=`Merci <strong>${fn}</strong> ! Commande enregistrée pour livraison à <strong>${ct}</strong>.<br>Paiement : ${payLabel} · Total : <strong>${fmt(tot)}</strong><br>Vous serez contacté(e) au <strong>${ph}</strong>.`;
   goPage('success');
@@ -1783,7 +1791,7 @@ function saveInvoiceSettings(){
   invoiceSettings.footer      = document.getElementById('invoiceFooter').value || '';
   invoiceSettings.watermark   = document.getElementById('invoiceWatermark').value;
   invoiceSettings.border      = document.getElementById('invoiceBorder').value;
-  toast('Préférences de facture enregistrées ✓');
+  toast('Préférences de facture enregistrées ✓');autoSave();
   previewInvoiceTheme();
 }
 
@@ -2205,7 +2213,7 @@ function saveProduct(){
     products.push({id:nextId++,name:nm,cat:ct,price:pr,oldPrice:op,emoji:em,stock:st,desc:ds||'Produit MC-STORE.',specs,isNew:true,images:[...newProdImages],reviews:[],videoUrl:vidUrl,videoBlob:vidBlob});
     toast('Produit ajouté ✓');
   }
-  resetProductForm();renderStockTable();renderGrid(products);renderSidebarCats();
+  resetProductForm();renderStockTable();renderGrid(products);renderSidebarCats();autoSave();
 }
 
 function resetProductForm(){
@@ -2249,8 +2257,8 @@ function renderStockTable(){
       </td>
     </tr>`).join('');
 }
-function updStock(id,v){const p=products.find(x=>x.id===id);if(p){p.stock=Math.max(0,parseInt(v)||0);renderStockTable();toast('Stock mis à jour');}}
-function delProd(id){if(!confirm('Supprimer ce produit ?'))return;products=products.filter(x=>x.id!==id);delete cart[id];updateBadge();renderStockTable();renderGrid(products);renderSidebarCats();toast('Produit supprimé');}
+function updStock(id,v){const p=products.find(x=>x.id===id);if(p){p.stock=Math.max(0,parseInt(v)||0);renderStockTable();toast('Stock mis à jour');autoSave();}}
+function delProd(id){if(!confirm('Supprimer ce produit ?'))return;products=products.filter(x=>x.id!==id);delete cart[id];updateBadge();renderStockTable();renderGrid(products);renderSidebarCats();toast('Produit supprimé');autoSave();}
 
 // ── COUPONS ──
 function addCoupon(){
@@ -2264,7 +2272,7 @@ function addCoupon(){
   if(coupons.find(c=>c.code===code)){toast('Ce code existe déjà');return;}
   coupons.push({code,type,value,min,max,used:0,active:true,desc});
   ['cpCode','cpValue','cpMin','cpMax','cpDesc'].forEach(id=>document.getElementById(id).value='');
-  renderCouponList();toast('Coupon créé ✓');
+  renderCouponList();toast('Coupon créé ✓');autoSave();
 }
 function renderCouponList(){
   document.getElementById('couponList').innerHTML=coupons.length
@@ -2283,8 +2291,8 @@ function renderCouponList(){
       </div>`).join('')
     :'<p style="color:var(--muted);font-size:13px;padding:20px">Aucun coupon créé.</p>';
 }
-function toggleCoupon(i){coupons[i].active=!coupons[i].active;renderCouponList();}
-function delCoupon(i){coupons.splice(i,1);renderCouponList();toast('Coupon supprimé');}
+function toggleCoupon(i){coupons[i].active=!coupons[i].active;renderCouponList();autoSave();}
+function delCoupon(i){coupons.splice(i,1);renderCouponList();toast('Coupon supprimé');autoSave();}
 
 // ── ADMIN ORDERS ──
 function renderAdminOrders(){
@@ -2377,7 +2385,7 @@ function renderAdminOrders(){
 }
 
 function updateOrderStatus(i, newStatus){
-  if(orders[i]){ orders[i].status = newStatus; toast('Statut mis à jour : '+newStatus); }
+  if(orders[i]){ orders[i].status = newStatus; toast('Statut mis à jour : '+newStatus); autoSave(); }
 }
 
 function deleteOrder(i){
@@ -2385,6 +2393,7 @@ function deleteOrder(i){
   orders.splice(i,1);
   renderAdminOrders();
   toast('Commande supprimée');
+  autoSave();
 }
 
 function sendWAReminder(o){
@@ -2548,7 +2557,8 @@ function applyFontSize(v){
   document.querySelectorAll('.hdr-top').forEach(el=>el.style.fontSize=(13*scale)+'px');
   document.querySelectorAll('.cat-btn,.sort-sel').forEach(el=>el.style.fontSize=(14*scale)+'px');
   document.querySelectorAll('.btn-full,.btn-full-out,.btn-gold,.btn-out').forEach(el=>el.style.fontSize=(14*scale)+'px');
-  toast('Taille de police : '+size+'px ✓');
+  autoSave();
+  toast('Taille de police : '+size+'px — sauvegardée ✓');
 }
 
 // ═══════════════════
@@ -2583,7 +2593,8 @@ function applyIllustration(){
     customImg.src = pendingIllustration;
     customImg.style.display = 'block';
   }
-  toast('Illustration mise à jour ✓');
+  autoSave();
+  toast('Illustration mise à jour et sauvegardée ✓');
 }
 
 function resetIllustration(){
@@ -2594,6 +2605,7 @@ function resetIllustration(){
   pendingIllustration = null;
   document.getElementById('illustrationPreviewAdmin').innerHTML = 'Illustration par défaut (dessin SVG)';
   document.getElementById('applyIllustrationBtn').style.display = 'none';
+  autoSave();
   toast('Illustration originale restaurée');
 }
 
@@ -2604,7 +2616,7 @@ function handleLogoUpload(e){
     LOGO_DATA=ev.target.result;
     document.getElementById('headerLogo').src=LOGO_DATA;
     document.getElementById('logoPreviewAdmin').src=LOGO_DATA;
-    toast('Logo mis à jour ✓');
+    toast('Logo mis à jour ✓');autoSave();
   };
   reader.readAsDataURL(file);
 }
@@ -2612,9 +2624,10 @@ function handleLogoUpload(e){
 function saveSettings(){
   const waNum=document.getElementById('waNumInput').value.trim();
   const waDisp=document.getElementById('waDisplayInput').value.trim();
-  if(waNum){WA=waNum;}
-  if(waDisp){document.getElementById('waNumDisplay').textContent=waDisp;}
-  toast('Paramètres enregistrés ✓');
+  if(waNum){ WA=waNum; }
+  if(waDisp){ document.getElementById('waNumDisplay').textContent=waDisp; }
+  autoSave();
+  toast('Paramètres enregistrés et sauvegardés ✓');
 }
 
 function changePassword(){
@@ -2626,11 +2639,101 @@ function changePassword(){
   ADMIN_PASS=p1;
   document.getElementById('newPassInput').value='';
   document.getElementById('newPassConfirm').value='';
-  toast('Mot de passe changé ✓');
+  autoSave();
+  toast('Mot de passe changé et sauvegardé ✓');autoSave();
 }
 
-// INIT
-renderGrid(products);renderSidebarCats();renderSiteReviews();
+// ═══════════════════════════
+// LOCALSTORAGE PERSISTENCE
+// ═══════════════════════════
+const LS_KEY = 'mcstore_data';
+
+function saveToStorage(){
+  try{
+    const customImg = document.getElementById('heroCustomImg');
+    const customIllustration = customImg && customImg.style.display!=='none' && customImg.src ? customImg.src : null;
+    const waDispEl = document.getElementById('waNumDisplay');
+    const data = {
+      products: products.map(p=>({...p, videoBlob:''})),
+      coupons,
+      orders,
+      siteReviews,
+      invoiceSettings,
+      WA,
+      waDisplay: waDispEl ? waDispEl.textContent : null,
+      LOGO_DATA: LOGO_DATA && LOGO_DATA.length > 100 ? LOGO_DATA : null,
+      customIllustration: customIllustration && customIllustration.length < 2000000 ? customIllustration : null,
+      fontSize: currentFontSize || 16,
+      adminPass: ADMIN_PASS
+    };
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
+  } catch(e){ console.warn('Storage save error:', e); }
+}
+
+function loadFromStorage(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return;
+    const data = JSON.parse(raw);
+    if(data.products && data.products.length) products = data.products;
+    if(data.coupons) coupons = data.coupons;
+    if(data.orders) orders = data.orders;
+    if(data.siteReviews) siteReviews = data.siteReviews;
+    if(data.invoiceSettings) invoiceSettings = {...invoiceSettings, ...data.invoiceSettings};
+    if(data.WA) WA = data.WA;
+    if(data.adminPass) ADMIN_PASS = data.adminPass;
+
+    // Restore logo
+    if(data.LOGO_DATA && data.LOGO_DATA.length > 100){
+      LOGO_DATA = data.LOGO_DATA;
+      setTimeout(()=>{
+        const hl = document.getElementById('headerLogo');
+        if(hl) hl.src = LOGO_DATA;
+        const lp = document.getElementById('logoPreviewAdmin');
+        if(lp) lp.src = LOGO_DATA;
+      }, 100);
+    }
+
+    // Restore WA display
+    setTimeout(()=>{
+      const waD = document.getElementById('waNumDisplay');
+      if(waD && data.waDisplay) waD.textContent = data.waDisplay;
+      else if(waD && data.WA) waD.textContent = '+' + data.WA;
+      const waI = document.getElementById('waNumInput');
+      if(waI && data.WA) waI.value = data.WA;
+    }, 150);
+
+    // Restore custom illustration
+    if(data.customIllustration && data.customIllustration.length > 50){
+      setTimeout(()=>{
+        const svg = document.getElementById('heroSVG');
+        const customImg = document.getElementById('heroCustomImg');
+        if(svg) svg.style.display = 'none';
+        if(customImg){ customImg.src = data.customIllustration; customImg.style.display = 'block'; }
+      }, 200);
+    }
+
+    // Restore font size
+    if(data.fontSize && data.fontSize !== 16){
+      currentFontSize = data.fontSize;
+      setTimeout(()=>{ applyFontSize(data.fontSize); }, 300);
+    }
+
+  } catch(e){ console.warn('Storage load error:', e); }
+}
+
+
+function autoSave(){
+  saveToStorage();
+}
+
+// ═══════════════════════════
+// STARTUP INIT
+// ═══════════════════════════
+loadFromStorage();
+renderGrid(products);
+renderSidebarCats();
+renderSiteReviews();
 applyFilters();
 addSpecRow();
 renderFeaturedVideos();
