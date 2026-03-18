@@ -1558,7 +1558,16 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
 </div></div>
 <div class="toast" id="toast"></div>
 
-<script>
+<script>// ── SAFE DOM HELPERS (prevent null errors)
+function gid(id){ return document.getElementById(id); }
+function setText(id,val){ const e=document.getElementById(id); if(e) e.textContent=val; }
+function setHTML(id,val){ const e=document.getElementById(id); if(e) e.innerHTML=val; }
+function setVal(id,val){ const e=document.getElementById(id); if(e) e.value=val; }
+function setSrc(id,val){ const e=document.getElementById(id); if(e) e.src=val; }
+function showEl(id,disp){ const e=document.getElementById(id); if(e) e.style.display=disp||'block'; }
+function hideEl(id){ const e=document.getElementById(id); if(e) e.style.display='none'; }
+
+
 // ══════════════════════════════════════
 // CANVAS BG
 // ══════════════════════════════════════
@@ -1841,11 +1850,11 @@ function doLogin(){
   const p=document.getElementById('loginPass').value;
   if(u===ADMIN_USER&&p===ADMIN_PASS){
     isAdmin=true;
-    document.getElementById('loginErr').textContent='';
+    setText('loginErr','');
     showAdminNav();
     goPage('admin');
   } else {
-    document.getElementById('loginErr').textContent='Identifiant ou mot de passe incorrect.';
+    setText('loginErr','Identifiant ou mot de passe incorrect.');
   }
 }
 
@@ -1863,7 +1872,7 @@ function closeMobileMenu(){
   const nav = document.querySelector('.hdr-nav');
   const btn = document.getElementById('hamburgerBtn');
   if(nav) nav.classList.remove('open');
-  if(btn) btn.innerHTML = '☰';
+  if(btn) btn.textContent = '☰';
   document.body.style.overflow = '';
 }
 
@@ -1908,25 +1917,23 @@ function renderPaymentOptions(){
 }
 
 function showAdminNav(){
-  document.getElementById('nb-orders').style.display='flex';
-  document.getElementById('nb-admin').textContent='⚙️ Admin';
+  const nbo=document.getElementById('nb-orders');if(nbo)nbo.style.display='flex';
+  const nba=document.getElementById('nb-admin');if(nba)nba.textContent='⚙️ Admin';
   updateOrdersBadge();
   startOrderPolling();
   requestNotificationPermission();
 }
 
 function hideAdminNav(){
-  document.getElementById('nb-orders').style.display='none';
-  document.getElementById('nb-admin').textContent='Admin';
+  const nbo=document.getElementById('nb-orders');if(nbo)nbo.style.display='none';
+  const nba=document.getElementById('nb-admin');if(nba)nba.textContent='Admin';
 }
 
 function updateOrdersBadge(){
   const badge=document.getElementById('ordersBadge');
   if(badge){
     badge.textContent=orders.length;
-    if(orders.length>0){
-      badge.style.display='flex';
-    }
+    badge.style.display=orders.length>0?'flex':'none';
   }
 }
 
@@ -2028,7 +2035,7 @@ function doLogout(){
 // ══════════════════════════════════════
 function renderGrid(list){
   document.getElementById('prodCount').textContent=list.length+' produit'+(list.length>1?'s':'');
-  document.getElementById('productGrid').innerHTML=list.length
+  const _pg=gid('productGrid');if(_pg)_pg.innerHTML=list.length
     ?list.map((p,i)=>{
       const avg=getAvgRating(p.reviews);
       const stars=avg>0?`<span class="stars" style="font-size:11px">${starsHTML(Math.round(avg))}</span><span style="font-size:10px;color:var(--muted)">(${p.reviews.length})</span>`:'';
@@ -2060,9 +2067,9 @@ function renderGrid(list){
 
 function renderSidebarCats(){
   const cats=[...new Set(products.map(p=>p.cat))];
-  document.getElementById('sbCats').innerHTML=
+  setHTML('sbCats',
     `<button class="cat-btn active" onclick="setCat('all',this)">Toutes les catégories</button>`+
-    cats.map(c=>`<button class="cat-btn" onclick="setCat('${c}',this)">${c}</button>`).join('');
+    cats.map(c=>`<button class="cat-btn" onclick="setCat('${c}',this)">${c}</button>`).join(''));
 }
 
 let currentCat='all';
@@ -2075,7 +2082,7 @@ function setCat(cat,btn){
 
 function applyFilters(){
   const maxPrice=parseInt(document.getElementById('priceRange').value)||500000;
-  document.getElementById('priceVal').textContent=Number(maxPrice).toLocaleString('fr-FR')+' FCFA';
+  setText('priceVal', Number(maxPrice).toLocaleString('fr-FR')+' FCFA');
   const sort=document.getElementById('sortSel').value;
   let list=products.filter(p=>currentCat==='all'||p.cat===currentCat).filter(p=>p.price<=maxPrice);
   const q=document.getElementById('hdrSearch').value.toLowerCase();
@@ -2086,7 +2093,7 @@ function applyFilters(){
   else if(sort==='rating')list=[...list].sort((a,b)=>getAvgRating(b.reviews)-getAvgRating(a.reviews));
   renderGrid(list);
   // show promo banner if active coupons
-  document.getElementById('promo-bar').style.display=coupons.some(c=>c.active)?'flex':'none';
+  showEl('promo-bar', coupons.some(c=>c.active)?'flex':'none');
 }
 
 function filterProds(q){applyFilters();}
@@ -2217,9 +2224,9 @@ function submitSiteRating(){
 
 function renderSiteReviews(){
   const avg=siteReviews.length?siteReviews.reduce((a,r)=>a+r.rating,0)/siteReviews.length:0;
-  document.getElementById('siteAvgNum').textContent=avg>0?avg.toFixed(1)+' / 5':'—';
-  document.getElementById('siteAvgSub').textContent=siteReviews.length?`Basé sur ${siteReviews.length} avis`:'Aucun avis pour le moment';
-  document.getElementById('siteRatingTop').textContent=avg>0?`⭐ ${avg.toFixed(1)}/5 (${siteReviews.length} avis)`:'⭐ Notez notre boutique';
+  const _san=document.getElementById('siteAvgNum');if(_san)_san.textContent=avg>0?avg.toFixed(1)+' / 5':'—';
+  const _sas=document.getElementById('siteAvgSub');if(_sas)_sas.textContent=siteReviews.length?`Basé sur ${siteReviews.length} avis`:'Aucun avis pour le moment';
+  const _srt=document.getElementById('siteRatingTop');if(_srt)_srt.textContent=avg>0?`⭐ ${avg.toFixed(1)}/5 (${siteReviews.length} avis)`:'⭐ Notez notre boutique';
   const wrap=document.getElementById('siteReviewsList');
   if(!siteReviews.length){wrap.innerHTML='';return;}
   wrap.innerHTML=siteReviews.slice(0,6).map((r,i)=>`
@@ -2255,7 +2262,7 @@ function addToCart(id,qty=1){
 function updateBadge(){
   const c=Object.values(cart).reduce((s,q)=>s+q,0);
   const b=document.getElementById('cartBadge');
-  b.textContent=c;b.style.display=c>0?'flex':'none';
+  if(b){b.textContent=c;b.style.display=c>0?'flex':'none';}
 }
 
 function getCartTotal(){
@@ -2305,14 +2312,14 @@ function updateCartSummary(){
   document.getElementById('scRows').innerHTML=
     keys.map(id=>{const p=products.find(x=>x.id==id);return`<div class="sc-row"><span>${p.name} ×${cart[id]}</span><span>${fmt(p.price*cart[id])}</span></div>`;}).join('')+
     (disc>0?`<div class="sc-row" style="color:#ACF0B4"><span>Réduction (${appliedCoupon.code})</span><span>-${fmt(disc)}</span></div>`:'');
-  document.getElementById('scTotal').textContent=fmt(tot);
+  setText('scTotal', fmt(tot));
 }
 
 function applyCoupon(){
   const code=document.getElementById('couponInput').value.trim().toUpperCase();
   const cp=coupons.find(c=>c.code===code&&c.active);
   const okEl=document.getElementById('couponOk');
-  if(!cp){okEl.style.display='block';okEl.style.color='#FF9090';okEl.textContent='Code invalide ou expiré.';return;}
+  if(!cp){okEl.style.display='block';okEl.style.color='#FF9090';if(okEl)okEl.textContent='Code invalide ou expiré.';return;}
   const sub=getCartTotal();
   if(cp.min>0&&sub<cp.min){okEl.style.display='block';okEl.style.color='#FF9090';okEl.textContent=`Ce coupon nécessite un minimum de ${fmt(cp.min)}.`;return;}
   if(cp.max>0&&cp.used>=cp.max){okEl.style.display='block';okEl.style.color='#FF9090';okEl.textContent='Ce coupon a atteint sa limite d\'utilisation.';return;}
@@ -2345,7 +2352,7 @@ function renderCkSummary(){
   document.getElementById('ckRows').innerHTML=
     keys.map(id=>{const p=products.find(x=>x.id==id);return`<div class="sc-row"><span>${p.name} ×${cart[id]}</span><span>${fmt(p.price*cart[id])}</span></div>`;}).join('')+
     (disc>0?`<div class="sc-row" style="color:#ACF0B4"><span>Réduction</span><span>-${fmt(disc)}</span></div>`:'');
-  document.getElementById('ckTotal').textContent=fmt(tot);
+  setText('ckTotal', fmt(tot));
 }
 
 function selPay(m){
@@ -2407,8 +2414,8 @@ function confirmOrder(){
   if(isAdmin)updateOrdersBadge();
   autoSave();
   autoSave();
-  document.getElementById('sucNum').textContent=num;
-  document.getElementById('sucMsg').innerHTML=`Merci <strong>${fn}</strong> ! Commande enregistrée pour livraison à <strong>${ct}</strong>.<br>Paiement : ${payLabel} · Total : <strong>${fmt(tot)}</strong><br>Vous serez contacté(e) au <strong>${ph}</strong>.`;
+  setText('sucNum', num);
+  setHTML('sucMsg',`Merci <strong>${fn}</strong> ! Commande enregistrée pour livraison à <strong>${ct}</strong>.<br>Paiement : ${payLabel} · Total : <strong>${fmt(tot)}</strong><br>Vous serez contacté(e) au <strong>${ph}</strong>.`);
   goPage('success');
 }
 
@@ -2917,7 +2924,7 @@ function resetProductForm(){
   ['nName','nCat','nPrice','nOldPrice','nStock','nEmoji','nDesc'].forEach(id=>document.getElementById(id).value='');
   clearVideo();
   document.getElementById('editingId').value='';
-  document.getElementById('addFormTitle').textContent='Ajouter un produit';
+  setText('addFormTitle','Ajouter un produit');
   document.getElementById('cancelEditBtn').style.display='none';
   newProdImages=[];renderImgPreview();
   editSpecs=[];addSpecRow();
@@ -2933,7 +2940,7 @@ function editProduct(id){
   document.getElementById('nEmoji').value=p.emoji;
   document.getElementById('nDesc').value=p.desc;
   document.getElementById('editingId').value=id;
-  document.getElementById('addFormTitle').textContent='Modifier le produit';
+  setText('addFormTitle','Modifier le produit');
   document.getElementById('cancelEditBtn').style.display='inline-flex';
   editSpecs=[...p.specs];renderSpecRows();
   newProdImages=[...p.images];renderImgPreview();
@@ -3156,16 +3163,16 @@ function handleVideoUpload(e){
     newProdVideoFile=file;
     const prev=document.getElementById('videoPreviewEl');
     prev.src=url;
-    document.getElementById('videoPreviewWrap').style.display='block';
+    showEl('videoPreviewWrap');
   };
 }
 
 function clearVideo(){
   newProdVideoBlob='';newProdVideoFile=null;newProdVideoUrl='';
   document.getElementById('nVideoUrl').value='';
-  document.getElementById('videoPreviewWrap').style.display='none';
+  hideEl('videoPreviewWrap');
   document.getElementById('videoPreviewEl').src='';
-  document.getElementById('videoDurationMsg').textContent='';
+  setText('videoDurationMsg','');
 }
 
 function getYouTubeEmbed(url){
@@ -3230,11 +3237,11 @@ function renderFeaturedVideos(){
 // ═══════════════════
 let currentFontSize=16;
 function previewFontSize(v){
-  document.getElementById('fontSizeLabel').textContent=v+'px';
+  setText('fontSizeLabel', v+'px');
 }
 function setFontPreset(v){
   document.getElementById('fontSizeRange').value=v;
-  document.getElementById('fontSizeLabel').textContent=v+'px';
+  setText('fontSizeLabel', v+'px');
   applyFontSize(v);
 }
 
@@ -3765,7 +3772,7 @@ function doEmpLogin(){
   const p = document.getElementById('empLoginPass').value;
   const emp = employees.find(e=>e.username===u && e.password===p && e.active);
   if(!emp){
-    document.getElementById('empLoginErr').textContent = 'Identifiant ou mot de passe incorrect, ou compte suspendu.';
+    setText('empLoginErr','Identifiant ou mot de passe incorrect, ou compte suspendu.');
     return;
   }
   currentEmployee = emp;
@@ -3773,10 +3780,10 @@ function doEmpLogin(){
   logActivity(emp.name, "Connexion", "Connexion à l'espace employé");
   document.getElementById('empLoginErr').textContent = '';
   // Setup employee panel
-  document.getElementById('empPanelTitle').textContent = 'Espace Employé — '+emp.name;
-  document.getElementById('empPanelSub').textContent = emp.role + ' · Connecté le ' + emp.lastLogin;
-  document.getElementById('empSessionName').textContent = emp.name;
-  document.getElementById('empSessionTime').textContent = 'Connexion: '+emp.lastLogin;
+  setText('empPanelTitle','Espace Employé — '+emp.name);
+  setText('empPanelSub',emp.role + ' · Connecté le ' + emp.lastLogin);
+  setText('empSessionName',emp.name);
+  setText('empSessionTime','Connexion: '+emp.lastLogin);
   // Build tabs based on permissions
   buildEmpTabs(emp);
   autoSave();
@@ -3918,7 +3925,7 @@ function empResetForm(){
   ['empNName','empNPrice','empNOldPrice','empNStock','empNEmoji','empNDesc'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('empNCat').value='';
   document.getElementById('empEditingId').value='';
-  document.getElementById('empAddFormTitle').textContent='Ajouter un produit';
+  setText('empAddFormTitle','Ajouter un produit');
   document.getElementById('empCancelEdit').style.display='none';
   empNewImages=[];renderEmpImgPreview();
 }
@@ -3933,7 +3940,7 @@ function empEditProduct(id){
   document.getElementById('empNEmoji').value=p.emoji;
   document.getElementById('empNDesc').value=p.desc;
   document.getElementById('empEditingId').value=id;
-  document.getElementById('empAddFormTitle').textContent='Modifier : '+p.name;
+  setText('empAddFormTitle','Modifier : '+p.name);
   document.getElementById('empCancelEdit').style.display='inline-flex';
   empNewImages=[...p.images];renderEmpImgPreview();
   window.scrollTo({top:0,behavior:'smooth'});
@@ -4319,7 +4326,7 @@ function forceSaveAll(){
 }
 
 function testStorage(){
-  const box = document.getElementById('storageStatusBox');
+  const box = gid('storageStatusBox');
   if(!box) return;
   try{
     // Test write
