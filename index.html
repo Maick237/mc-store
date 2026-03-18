@@ -1963,36 +1963,48 @@ function stopOrderPolling(){
 }
 
 function showNewOrderNotif(count, order){
-  // Visual notification
   const notif = document.createElement('div');
+  notif.id = 'newOrderNotif';
   notif.style.cssText = 'position:fixed;top:80px;right:20px;z-index:9999;background:linear-gradient(135deg,#27AE60,#2ECC71);color:white;padding:16px 20px;border-radius:12px;box-shadow:0 8px 32px rgba(39,174,96,0.4);font-family:var(--fb);max-width:300px;animation:pgIn 0.4s ease';
-  notif.innerHTML = '<div style="font-size:16px;font-weight:600;margin-bottom:4px">🛍️ Nouvelle commande !</div>' +
-    '<div style="font-size:13px;opacity:0.9">'+count+' nouvelle(s) commande(s) reçue(s)</div>' +
-    (order ? '<div style="font-size:12px;margin-top:6px;opacity:0.8">Client: '+order.delivery.name+' · '+formatAmount(order.total)+'</div>' : '') +
-    '<button onclick="this.parentElement.remove();goPage('admin');setTimeout(()=>switchAdminTab('orders'),100)" style="margin-top:10px;background:rgba(255,255,255,0.25);border:none;border-radius:6px;padding:6px 14px;color:white;cursor:pointer;font-size:12px;font-family:var(--fb)">Voir les commandes →</button>';
+  const clientName = order ? order.delivery.name : '';
+  const amount = order ? formatAmount(order.total) : '';
+  notif.innerHTML = '<div style="font-size:16px;font-weight:600;margin-bottom:4px">&#128717; Nouvelle commande !</div>'
+    + '<div style="font-size:13px;opacity:0.9">' + count + ' nouvelle(s) commande(s) reçue(s)</div>'
+    + (order ? '<div style="font-size:12px;margin-top:6px;opacity:0.8">Client: ' + clientName + ' · ' + amount + '</div>' : '')
+    + '<div style="display:flex;gap:8px;margin-top:10px">'
+    + '<button id="notifViewBtn" style="background:rgba(255,255,255,0.25);border:none;border-radius:6px;padding:6px 14px;color:white;cursor:pointer;font-size:12px;font-family:inherit">Voir les commandes →</button>'
+    + '<button id="notifCloseBtn" style="background:rgba(0,0,0,0.2);border:none;border-radius:6px;padding:6px 10px;color:white;cursor:pointer;font-size:12px;font-family:inherit">✕</button>'
+    + '</div>';
   document.body.appendChild(notif);
-  // Auto remove after 8 seconds
-  setTimeout(()=>{ if(notif.parentElement) notif.remove(); }, 8000);
-  // Try browser notification
+  // Add click handlers AFTER appending (no inline onclick needed)
+  document.getElementById('notifViewBtn').onclick = function(){
+    notif.remove();
+    goPage('admin');
+    setTimeout(function(){ switchAdminTab('orders'); }, 100);
+  };
+  document.getElementById('notifCloseBtn').onclick = function(){
+    notif.remove();
+  };
+  setTimeout(function(){ if(notif.parentElement) notif.remove(); }, 8000);
+  // Browser notification
   if('Notification' in window && Notification.permission === 'granted'){
-    new Notification('🛍️ MC-STORE - Nouvelle commande !', {
-      body: 'Client: '+(order?order.delivery.name:'')+ ' · '+(order?fmt(order.total):''),
-      icon: '/mc-store/logo.png'
+    new Notification('MC-STORE - Nouvelle commande !', {
+      body: 'Client: ' + clientName + ' - ' + amount
     });
   }
   // Play sound
   try{
-    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.connect(gain); gain.connect(ctx.destination);
     osc.frequency.setValueAtTime(880, ctx.currentTime);
-    osc.frequency.setValueAtTime(1100, ctx.currentTime+0.1);
-    osc.frequency.setValueAtTime(880, ctx.currentTime+0.2);
+    osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
+    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.2);
     gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.4);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
     osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime+0.4);
+    osc.stop(ctx.currentTime + 0.4);
   } catch(e){}
 }
 
