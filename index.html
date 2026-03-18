@@ -1421,6 +1421,13 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
 </div>
 
 <!-- WA FLOAT -->
+<!-- Mobile Admin Quick Access (only shown on small screens) -->
+<div id="mobileAdminBtn" style="position:fixed;bottom:88px;left:16px;z-index:500;display:none">
+  <button onclick="goAdminOrLogin()" style="background:rgba(10,12,26,0.95);border:1px solid rgba(245,166,35,0.5);border-radius:50px;padding:10px 16px;cursor:pointer;color:var(--gold);font-size:12px;font-weight:600;font-family:var(--fb);display:flex;align-items:center;gap:6px;backdrop-filter:blur(10px);box-shadow:0 4px 16px rgba(0,0,0,0.3)">
+    🔐 Admin
+  </button>
+</div>
+
 <div class="wa-float"><div class="wa-wrap">
   <span class="wa-tip">Contacter MC-STORE</span>
   <button class="wa-btn" onclick="openWA()">
@@ -2128,7 +2135,13 @@ function confirmOrder(){
   const payLabel=plabels[selPayment]||'Non spécifié';
   const items=keys.map(id=>{const p=products.find(x=>x.id==id);return{id:p.id,emoji:p.emoji,name:p.name,cat:p.cat,qty:cart[id],price:p.price,total:p.price*cart[id]};});
   keys.forEach(id=>{const p=products.find(x=>x.id==id);if(p)p.stock=Math.max(0,p.stock-cart[id]);});
-  const order={num,date:new Date().toLocaleDateString('fr-FR'),items,subtotal:sub,discount:disc,total:tot,payment:payLabel,coupon:appliedCoupon?appliedCoupon.code:'',delivery:{name:fn+' '+ln,phone:ph,city:ct,address:ad,note:document.getElementById('note').value||''},status:'Confirmée'};
+  // Tag order with client session ID
+  let clientId = sessionStorage.getItem('mcstore_client_id');
+  if(!clientId){
+    clientId = 'client_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+    sessionStorage.setItem('mcstore_client_id', clientId);
+  }
+  const order={num,date:new Date().toLocaleDateString('fr-FR'),items,subtotal:sub,discount:disc,total:tot,payment:payLabel,coupon:appliedCoupon?appliedCoupon.code:'',delivery:{name:fn+' '+ln,phone:ph,city:ct,address:ad,note:document.getElementById('note').value||''},status:'Confirmée',clientId};
   orders.unshift(order);lastOrder=order;
   sendWAOrder(order);
   cart={};appliedCoupon=null;updateBadge();
@@ -2146,19 +2159,18 @@ function confirmOrder(){
 function sendWAOrder(o){
   const lines=o.items.map(i=>'• '+i.name+' ×'+i.qty+' = '+fmt(i.total)).join('\n');
   const msg='🛍️ *NOUVELLE COMMANDE MC-STORE*\n\n*N°:* '+o.num+'\n*Client:* '+o.delivery.name+'\n*Tél:* '+o.delivery.phone+'\n*Ville:* '+o.delivery.city+'\n*Adresse:* '+o.delivery.address+'\n\n*Articles:*\n'+lines+(o.discount>0?'\n*Réduction ('+o.coupon+'):* -'+fmt(o.discount):'')+'\n*Total:* '+fmt(o.total)+'\n*Paiement:* '+o.payment+(o.delivery.note?'\n*Note:* '+o.delivery.note:'')+'\n\n_MC-STORE_';
-  const waUrl = 'https://wa.me/'+WA+'?text='+encodeURIComponent(msg);
-  // Mobile-friendly: use anchor click instead of window.open
+  // Clean WA number: remove spaces, +, dashes
+  const cleanWA = WA.toString().replace(/[^0-9]/g,'');
+  const waUrl = 'https://wa.me/'+cleanWA+'?text='+encodeURIComponent(msg);
   const a = document.createElement('a');
-  a.href = waUrl;
-  a.target = '_blank';
-  a.rel = 'noopener';
-  document.body.appendChild(a);
-  a.click();
+  a.href = waUrl; a.target = '_blank'; a.rel = 'noopener';
+  document.body.appendChild(a); a.click();
   setTimeout(()=>document.body.removeChild(a), 500);
 }
 function openWA(){
   const msg = 'Bonjour ! Je souhaite passer une commande sur MC-STORE.';
-  const waUrl = 'https://wa.me/'+WA+'?text='+encodeURIComponent(msg);
+  const cleanWA = WA.toString().replace(/[^0-9]/g,'');
+  const waUrl = 'https://wa.me/'+cleanWA+'?text='+encodeURIComponent(msg);
   const a = document.createElement('a');
   a.href = waUrl; a.target = '_blank'; a.rel = 'noopener';
   document.body.appendChild(a); a.click();
@@ -2474,7 +2486,15 @@ function downloadLastInvoice(){if(lastOrder)generateInvoicePDF(lastOrder);else t
 // ══════════════════════════════════════
 function renderHistory(){
   const w=document.getElementById('historyList');
-  if(!orders.length){
+  // Get this client's session ID (unique per browser session)
+  let clientId = sessionStorage.getItem('mcstore_client_id');
+  if(!clientId){
+    clientId = 'client_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+    sessionStorage.setItem('mcstore_client_id', clientId);
+  }
+  // Show only orders that match this client's session
+  const myOrders = orders.filter(o => o.clientId === clientId);
+  if(!myOrders.length){
     w.innerHTML=`<div style="text-align:center;padding:60px 20px">
       <div style="font-size:52px;margin-bottom:14px;opacity:0.4">🛍️</div>
       <p style="font-size:15px;color:var(--muted);margin-bottom:18px">Vous n'avez pas encore passé de commande.</p>
@@ -2482,9 +2502,11 @@ function renderHistory(){
     </div>`;
     return;
   }
-  w.innerHTML=orders.map((o,i)=>`
+  w.innerHTML=myOrders.map((o,i)=>{
+    const globalIdx = orders.indexOf(o);
+    return `
     <div class="h-card">
-      <div class="h-hdr" onclick="toggleH(${i})">
+      <div class="h-hdr" onclick="toggleH(${globalIdx})">
         <div>
           <div class="hnum">${o.num}</div>
           <div class="hdate">${o.date} · ${o.payment}</div>
@@ -2495,7 +2517,7 @@ function renderHistory(){
           <span style="color:var(--muted);font-size:10px">▼</span>
         </div>
       </div>
-      <div class="h-body" id="hb-${i}">
+      <div class="h-body" id="hb-${globalIdx}">
         <div style="margin-bottom:10px">
           ${o.items.map(it=>`<div class="hitem">
             <span>${it.emoji} ${it.name} <span style="color:var(--muted)">×${it.qty}</span></span>
@@ -2511,23 +2533,21 @@ function renderHistory(){
             <div style="font-size:12px;color:var(--muted);margin-top:3px">📱 Contact : ${o.delivery.phone}</div>
           </div>
           <div style="text-align:right">
-            <div style="font-size:12px;color:var(--muted)">Mode de paiement</div>
+            <div style="font-size:12px;color:var(--muted)">Paiement</div>
             <div style="font-size:13px;color:var(--gold2);font-weight:500">${o.payment}</div>
           </div>
         </div>
         <div style="padding:10px 0 4px;border-top:1px solid rgba(245,166,35,0.07)">
-          <div style="font-size:12px;color:var(--muted)">Statut de votre commande :</div>
-          <div style="margin-top:6px">
-            ${['Confirmée','En préparation','Expédiée','Livrée'].map(st=>`
-              <span style="font-size:11px;padding:3px 10px;border-radius:20px;margin-right:4px;
-                background:${o.status===st?'rgba(245,166,35,0.2)':'rgba(255,255,255,0.04)'};
-                color:${o.status===st?'var(--gold)':'var(--muted)'};
-                border:1px solid ${o.status===st?'rgba(245,166,35,0.4)':'rgba(255,255,255,0.08)'};
-                font-weight:${o.status===st?'600':'400'}">${st}</span>`).join('')}
-          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Statut de votre commande :</div>
+          ${['Confirmée','En préparation','Expédiée','Livrée'].map(st=>`
+            <span style="font-size:11px;padding:3px 10px;border-radius:20px;margin-right:4px;
+              background:${o.status===st?'rgba(245,166,35,0.2)':'rgba(255,255,255,0.04)'};
+              color:${o.status===st?'var(--gold)':'var(--muted)'};
+              border:1px solid ${o.status===st?'rgba(245,166,35,0.4)':'rgba(255,255,255,0.08)'};
+              font-weight:${o.status===st?'600':'400'}">${st}</span>`).join('')}
         </div>
       </div>
-    </div>`).join('');
+    </div>`}).join('');
 }
 function toggleH(i){document.getElementById('hb-'+i).classList.toggle('open');}
 
@@ -4134,6 +4154,16 @@ function clearAllStorage(){
     }
   } catch(e){ console.warn('Hero restore error:', e); }
 })();
+
+// Show mobile admin button on small screens
+if(window.innerWidth <= 600){
+  const mab = document.getElementById('mobileAdminBtn');
+  if(mab) mab.style.display = 'block';
+}
+window.addEventListener('resize', ()=>{
+  const mab = document.getElementById('mobileAdminBtn');
+  if(mab) mab.style.display = window.innerWidth <= 600 ? 'block' : 'none';
+});
 
 loadFromStorage();
 renderGrid(products);
