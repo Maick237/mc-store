@@ -3,7 +3,39 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>MC-STORE — Boutique Personnelle</title>
+<title>MC-STORE — Les bonnes trouvailles, au bon moment.</title>
+<meta name="description" content="MC-STORE — Les bonnes trouvailles, au bon moment. Boutique en ligne au Cameroun. Mode, électronique, beauté, maison et plus. Livraison disponible."/>
+<meta name="keywords" content="MC-STORE, boutique en ligne, Cameroun, acheter en ligne, livraison Cameroun, mode, électronique"/>
+<meta name="robots" content="index, follow"/>
+<meta name="author" content="MC-STORE"/>
+<meta property="og:title" content="MC-STORE — Les bonnes trouvailles, au bon moment."/>
+<meta property="og:description" content="Boutique en ligne au Cameroun. Mode, électronique, beauté et plus. Livraison disponible."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://Maick237.github.io/mc-store/"/>
+<meta property="og:image" content="https://Maick237.github.io/mc-store/logo.png"/>
+<meta property="og:locale" content="fr_CM"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="MC-STORE"/>
+<meta name="twitter:description" content="Les bonnes trouvailles, au bon moment."/>
+<link rel="canonical" href="https://Maick237.github.io/mc-store/"/>
+<meta name="description" content="MC-STORE — Votre boutique en ligne personnelle au Cameroun. Mode, électronique, beauté, maison et plus. Livraison disponible. Paiement Orange Money, MTN MoMo, carte bancaire."/>
+<meta name="keywords" content="MC-STORE, boutique en ligne Cameroun, shopping Cameroun, livraison Yaoundé, livraison Douala, mode Cameroun, électronique Cameroun"/>
+<meta name="robots" content="index, follow"/>
+<meta name="theme-color" content="#F5A623"/>
+<!-- Open Graph (Facebook, WhatsApp preview) -->
+<meta property="og:title" content="MC-STORE — Les bonnes trouvailles, au bon moment."/>
+<meta property="og:description" content="Boutique en ligne personnelle au Cameroun. Qualité supérieure, prix accessibles, livraison à domicile."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://Maick237.github.io/mc-store/"/>
+<meta property="og:image" content="https://Maick237.github.io/mc-store/logo.png"/>
+<meta property="og:locale" content="fr_CM"/>
+<meta property="og:site_name" content="MC-STORE"/>
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="MC-STORE — Boutique Personnelle"/>
+<meta name="twitter:description" content="Les bonnes trouvailles, au bon moment. Livraison au Cameroun."/>
+<!-- Favicon inline (orange MC) -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23F5A623'/><text y='.9em' font-size='80' x='10'>🛍️</text></svg>"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -86,7 +118,18 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
 
 /* ─── FILTERS ─── */
 .shop-layout{display:grid;grid-template-columns:220px 1fr;gap:28px;align-items:start}
-@media(max-width:860px){.shop-layout{grid-template-columns:1fr}}
+@media(max-width:860px){
+  .shop-layout{grid-template-columns:1fr}
+  .sidebar{display:none;position:fixed;inset:0;z-index:400;overflow-y:auto;border-radius:0;top:70px;bottom:0;width:280px;background:rgba(10,12,26,0.98);backdrop-filter:blur(20px)}
+  .sidebar.open{display:block}
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:399}
+  .sidebar-overlay.open{display:block}
+  .filter-fab{display:flex}
+}
+@media(min-width:861px){
+  .filter-fab{display:none}
+  .sidebar-close-btn{display:none}
+}
 .sidebar{background:rgba(255,255,255,0.025);border:1px solid rgba(201,168,76,0.1);border-radius:var(--rl);padding:18px;position:sticky;top:88px}
 .sb-title{font-family:var(--fd);font-size:17px;font-weight:600;color:var(--cream);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,0.1)}
 .sb-section{margin-bottom:18px}
@@ -399,9 +442,15 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
 @media(max-width:600px){
   .hero-title{font-size:36px}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
-  .hdr-nav .hn{display:none}
+  .hdr-nav{display:none}
+  .hdr-nav.open{display:flex;flex-direction:column;position:fixed;top:70px;left:0;right:0;background:rgba(10,12,26,0.98);backdrop-filter:blur(20px);padding:16px;gap:6px;z-index:500;border-bottom:1px solid rgba(245,166,35,0.2)}
+  .hdr-nav.open .hn{display:flex;width:100%;padding:12px 16px;font-size:14px;border:1px solid rgba(245,166,35,0.1);border-radius:var(--r)}
+  .hamburger{display:flex}
   .search-hdr{display:none}
   .pay-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(min-width:601px){
+  .hamburger{display:none}
 }
 </style>
 </head>
@@ -424,8 +473,13 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
       <button class="hn" id="nb-history" onclick="goPage('history')">Mes achats</button>
       <button class="hn" id="nb-orders" onclick="goPage('admin');setTimeout(()=>switchAdminTab('orders'),100)" style="display:none">📋 Commandes <span id="ordersBadge" style="background:var(--gold);color:var(--dark);border-radius:50%;width:17px;height:17px;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;vertical-align:middle">0</span></button>
       <button class="hn" id="nb-admin" onclick="goAdminOrLogin()">Admin</button>
+      <button class="hn" id="nb-emp" onclick="goPage('emp-login')" style="font-size:11px">👤 Employé</button>
     </nav>
-    <div class="hdr-right">
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()" 
+  style="background:transparent;border:1px solid rgba(245,166,35,0.3);border-radius:var(--r);padding:8px 12px;cursor:pointer;color:var(--gold);font-size:18px;display:none">
+  ☰
+</button>
+<div class="hdr-right">
       <div class="search-hdr">
         <span style="color:var(--gold);font-size:14px">⌕</span>
         <input type="text" placeholder="Rechercher..." oninput="filterProds(this.value)" id="hdrSearch"/>
@@ -668,9 +722,14 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
   </div>
 
   <div id="shop-anchor" style="padding-top:10px">
+  <!-- Mobile filter overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
     <div class="shop-layout">
       <div class="sidebar">
-        <div class="sb-title">Filtrer</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(245,166,35,0.1)">
+          <div class="sb-title" style="margin-bottom:0">Filtrer</div>
+          <button class="sidebar-close-btn" onclick="closeSidebar()" style="background:transparent;border:1px solid rgba(245,166,35,0.3);border-radius:var(--r);padding:6px 12px;cursor:pointer;color:var(--gold);font-size:14px;font-family:var(--fb)">✕ Fermer</button>
+        </div>
         <div class="sb-section">
           <div class="sb-label">Catégories</div>
           <div class="sb-cats" id="sbCats"></div>
@@ -694,6 +753,12 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
         </div>
       </div>
       <div>
+        <!-- Mobile filter button -->
+        <div class="filter-fab" style="margin-bottom:12px">
+          <button onclick="openSidebar()" style="display:flex;align-items:center;gap:8px;background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.3);border-radius:var(--r);padding:10px 16px;cursor:pointer;color:var(--gold);font-size:14px;font-family:var(--fb);width:100%;justify-content:center">
+            🔍 Filtrer & Trier les produits
+          </button>
+        </div>
         <div class="sec-hdr">
           <h2 class="sec-title">Nos Produits</h2>
           <span class="sec-count" id="prodCount"></span>
@@ -761,6 +826,9 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
         </div>
         <button class="btn-full" id="dAddBtn" onclick="addFromDetail()">Ajouter au panier</button>
         <button class="btn-full-out" onclick="goPage('cart')">Voir le panier</button>
+        <button class="btn-full-out" id="dShareBtn" onclick="showShareModal(curDetail?curDetail.id:0)" style="background:rgba(37,211,102,0.1);border-color:rgba(37,211,102,0.4);color:#25D366;margin-top:4px">
+          📲 Partager sur WhatsApp
+        </button>
       </div>
     </div>
     <!-- REVIEWS for product -->
@@ -901,6 +969,8 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
       <button class="atab" id="atab-coupons" onclick="switchAdminTab('coupons')">🎟️ Coupons</button>
       <button class="atab" id="atab-orders" onclick="switchAdminTab('orders')">📋 Commandes</button>
       <button class="atab" id="atab-reviews" onclick="switchAdminTab('reviews')">⭐ Avis</button>
+      <button class="atab" id="atab-employees" onclick="switchAdminTab('employees')">👥 Employés</button>
+      <button class="atab" id="atab-activity" onclick="switchAdminTab('activity')">📊 Activité</button>
       <button class="atab" id="atab-settings" onclick="switchAdminTab('settings')">⚙️ Paramètres</button>
     </div>
 
@@ -1024,6 +1094,56 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
     <!-- REVIEWS TAB -->
     <div class="admin-section" id="asec-reviews">
       <div id="adminReviewsList"></div>
+    </div>
+
+    <!-- EMPLOYEES TAB -->
+    <div class="admin-section" id="asec-employees">
+      <div class="acard">
+        <h3>➕ Ajouter un employé</h3>
+        <div class="add-grid">
+          <div class="ag"><label>Prénom & Nom</label><input type="text" id="empFullName" placeholder="Ex: Jean Dupont"/></div>
+          <div class="ag"><label>Identifiant de connexion</label><input type="text" id="empUsername" placeholder="Ex: jean.dupont" autocomplete="off"/></div>
+          <div class="ag"><label>Mot de passe</label><input type="password" id="empPassword" placeholder="Minimum 6 caractères"/></div>
+          <div class="ag"><label>Numéro WhatsApp (avec indicatif)</label><input type="text" id="empPhone" placeholder="Ex: 237699123456"/></div>
+          <div class="ag"><label>Poste / Rôle <span style="color:var(--muted);font-size:10px">(optionnel)</span></label><input type="text" id="empRole" placeholder="Ex: Gestionnaire des stocks"/></div>
+          <div class="ag"><label>Couleur avatar</label>
+            <select id="empColor">
+              <option value="#F5A623">Orange MC-STORE</option>
+              <option value="#1A3A8C">Bleu marine</option>
+              <option value="#2A7A3A">Vert</option>
+              <option value="#8C2020">Rouge</option>
+              <option value="#6B35A0">Violet</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <div class="sb-label" style="margin-bottom:10px">Permissions de l'employé</div>
+          <div class="perm-grid" id="newEmpPerms">
+            <label class="perm-item granted" id="perm-orders"><span class="perm-toggle on">✓</span> Gérer les commandes<input type="checkbox" checked style="display:none" data-perm="orders"/></label>
+            <label class="perm-item granted" id="perm-products"><span class="perm-toggle on">✓</span> Produits<input type="checkbox" checked style="display:none" data-perm="products"/></label>
+            <label class="perm-item granted" id="perm-stock"><span class="perm-toggle on">✓</span> Stocks<input type="checkbox" checked style="display:none" data-perm="stock"/></label>
+            <label class="perm-item" id="perm-coupons"><span class="perm-toggle"></span> Coupons<input type="checkbox" style="display:none" data-perm="coupons"/></label>
+            <label class="perm-item" id="perm-reviews"><span class="perm-toggle"></span> Voir les avis<input type="checkbox" style="display:none" data-perm="reviews"/></label>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-top:8px">Cliquez sur une permission pour l'activer/désactiver</p>
+        </div>
+        <button class="btn-gold" style="margin-top:16px" onclick="addEmployee()">➕ Créer le compte employé</button>
+      </div>
+      <div id="employeesList"></div>
+    </div>
+
+    <!-- ACTIVITY LOG TAB -->
+    <div class="admin-section" id="asec-activity">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <h3 style="font-family:var(--fd);font-size:20px;font-weight:400;color:var(--cream)">Journal d'activité</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <select id="activityFilter" style="background:var(--dark2);border:1px solid rgba(245,166,35,0.2);color:var(--cream);font-size:12px;padding:6px 10px;border-radius:var(--r)" onchange="renderActivityLog()">
+            <option value="all">Tous les employés</option>
+          </select>
+          <button class="del-btn" onclick="clearActivityLog()" style="font-size:12px;padding:6px 14px">🗑️ Effacer le journal</button>
+        </div>
+      </div>
+      <div class="activity-log" id="activityLog"></div>
     </div>
 
     <!-- SETTINGS TAB -->
@@ -1207,6 +1327,107 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
       </div>
 
       <!-- PASSWORD -->
+      <!-- ANIMATION & COLORS SETTINGS -->
+      <div class="acard">
+        <h3>🎨 Animations & Couleurs</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Personnalisez l'arrière-plan animé et les couleurs de votre boutique.</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
+          <div class="ag">
+            <label>Type d'animation</label>
+            <select id="animType" onchange="previewAnimChange()">
+              <option value="particles">Particules connectées (défaut)</option>
+              <option value="stars">Étoiles filantes</option>
+              <option value="bubbles">Bulles flottantes</option>
+              <option value="confetti">Confettis colorés</option>
+              <option value="images">Images personnalisées</option>
+            </select>
+          </div>
+          <div class="ag">
+            <label>Nombre de particules / éléments</label>
+            <input type="range" id="animCount" min="10" max="150" value="75" step="5"
+              oninput="document.getElementById('animCountVal').textContent=this.value"
+              style="accent-color:var(--gold);width:100%"/>
+            <span style="font-size:12px;color:var(--gold)" id="animCountVal">75</span>
+          </div>
+          <div class="ag">
+            <label>Vitesse de l'animation</label>
+            <input type="range" id="animSpeed" min="0.1" max="3" value="1" step="0.1"
+              oninput="document.getElementById('animSpeedVal').textContent=parseFloat(this.value).toFixed(1)+'x'"
+              style="accent-color:var(--gold);width:100%"/>
+            <span style="font-size:12px;color:var(--gold)" id="animSpeedVal">1.0x</span>
+          </div>
+          <div class="ag">
+            <label>Nombre d'images/emojis flottants</label>
+            <input type="range" id="animFloaters" min="0" max="40" value="16" step="2"
+              oninput="document.getElementById('animFloatersVal').textContent=this.value"
+              style="accent-color:var(--gold);width:100%"/>
+            <span style="font-size:12px;color:var(--gold)" id="animFloatersVal">16</span>
+          </div>
+          <div class="ag">
+            <label>Couleur principale des particules</label>
+            <div style="display:flex;align-items:center;gap:10px">
+              <input type="color" id="animColor1" value="#F5A623"
+                style="width:50px;height:36px;border:1px solid rgba(245,166,35,0.3);border-radius:var(--r);cursor:pointer;background:transparent"/>
+              <input type="text" id="animColor1Hex" value="#F5A623" placeholder="#F5A623"
+                style="flex:1" oninput="document.getElementById('animColor1').value=this.value"/>
+            </div>
+          </div>
+          <div class="ag">
+            <label>Couleur secondaire des particules</label>
+            <div style="display:flex;align-items:center;gap:10px">
+              <input type="color" id="animColor2" value="#1A2A64"
+                style="width:50px;height:36px;border:1px solid rgba(245,166,35,0.3);border-radius:var(--r);cursor:pointer;background:transparent"/>
+              <input type="text" id="animColor2Hex" value="#1A2A64" placeholder="#1A2A64"
+                style="flex:1" oninput="document.getElementById('animColor2').value=this.value"/>
+            </div>
+          </div>
+          <div class="ag">
+            <label>Couleur principale de la boutique</label>
+            <div style="display:flex;align-items:center;gap:10px">
+              <input type="color" id="shopColor1" value="#F5A623"
+                style="width:50px;height:36px;border:1px solid rgba(245,166,35,0.3);border-radius:var(--r);cursor:pointer;background:transparent"/>
+              <input type="text" id="shopColor1Hex" value="#F5A623" placeholder="#F5A623"
+                style="flex:1" oninput="document.getElementById('shopColor1').value=this.value"/>
+            </div>
+          </div>
+          <div class="ag">
+            <label>Couleur secondaire de la boutique</label>
+            <div style="display:flex;align-items:center;gap:10px">
+              <input type="color" id="shopColor2" value="#1A2A64"
+                style="width:50px;height:36px;border:1px solid rgba(245,166,35,0.3);border-radius:var(--r);cursor:pointer;background:transparent"/>
+              <input type="text" id="shopColor2Hex" value="#1A2A64" placeholder="#1A2A64"
+                style="flex:1" oninput="document.getElementById('shopColor2').value=this.value"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- BG IMAGES UPLOAD -->
+        <div style="margin-bottom:18px">
+          <div class="sb-label" style="margin-bottom:8px">Images flottantes dans l'animation (max 5 — PNG sans fond recommandé)</div>
+          <div class="img-upload-area" onclick="document.getElementById('bgImgInput').click()" style="max-width:400px;padding:14px">
+            <input type="file" id="bgImgInput" accept="image/*" multiple onchange="handleBgImgUpload(event)"/>
+            <div style="font-size:22px;margin-bottom:4px">🖼️</div>
+            <div style="font-size:12px;color:var(--muted)">Cliquer pour ajouter des images d'animation<br><span style="font-size:10px">Idéal : PNG transparent, logos, icônes</span></div>
+          </div>
+          <div id="bgImgPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"></div>
+        </div>
+
+        <!-- PREVIEW -->
+        <div style="margin-bottom:14px">
+          <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Aperçu couleurs boutique</div>
+          <div id="colorPreviewBox" style="border-radius:var(--rl);padding:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+            <span style="font-weight:600;font-size:16px" id="cpBoxTitle">MC-STORE</span>
+            <button style="padding:8px 18px;border:none;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer" id="cpBoxBtn">Voir les produits</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-gold" onclick="applyAnimSettings()">✓ Appliquer les changements</button>
+          <button class="btn-out" onclick="resetAnimSettings()" style="font-size:13px">↺ Réinitialiser par défaut</button>
+        </div>
+      </div>
+
       <div class="acard">
         <h3>🔐 Changer le mot de passe admin</h3>
         <div class="add-grid" style="max-width:480px">
@@ -1231,6 +1452,107 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
   </div>
 </div>
 
+<!-- ═══ EMPLOYEE LOGIN ═══ -->
+<div class="page" id="page-emp-login">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">MC—STORE</div>
+      <div class="login-sub">Espace Employé</div>
+      <div class="login-field"><label>Identifiant</label><input type="text" id="empLoginUser" placeholder="Votre identifiant" autocomplete="off"/></div>
+      <div class="login-field"><label>Mot de passe</label><input type="password" id="empLoginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doEmpLogin()"/></div>
+      <div class="login-err" id="empLoginErr"></div>
+      <button class="login-btn" onclick="doEmpLogin()">Se connecter</button>
+      <div style="margin-top:14px;text-align:center"><button style="background:transparent;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:var(--fb)" onclick="goPage('login')">← Connexion Admin</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EMPLOYEE PANEL ═══ -->
+<div class="page" id="page-emp-panel">
+  <div class="stock-wrap">
+    <div class="admin-banner">
+      <div>
+        <div class="ab-title" id="empPanelTitle">Espace Employé</div>
+        <div class="ab-sub" id="empPanelSub">Bienvenue</div>
+      </div>
+      <button class="logout-btn" onclick="doEmpLogout()">⎋ Déconnexion</button>
+    </div>
+    <div class="emp-session-bar" id="empSessionBar">
+      <div class="emp-session-info">Connecté en tant que : <span class="emp-session-name" id="empSessionName"></span></div>
+      <div style="font-size:11px;color:var(--muted)" id="empSessionTime"></div>
+    </div>
+    <div class="admin-tabs" id="empTabs"></div>
+    <!-- EMPLOYEE SECTIONS -->
+    <div class="admin-section active" id="emp-sec-orders">
+      <div id="empOrdersList"></div>
+    </div>
+    <div class="admin-section" id="emp-sec-products">
+      <div class="acard">
+        <h3 id="empAddFormTitle">Ajouter un produit</h3>
+        <input type="hidden" id="empEditingId" value=""/>
+        <div class="add-grid">
+          <div class="ag"><label>Nom du produit</label><input type="text" id="empNName" placeholder="Ex: Chemise blanche"/></div>
+          <div class="ag"><label>Catégorie</label>
+            <select id="empNCat">
+              <option value="">— Choisir —</option>
+              <option>Mode & Vêtements</option><option>Chaussures & Accessoires</option>
+              <option>Beauté & Soins</option><option>Électronique & High-Tech</option>
+              <option>Maison & Décoration</option><option>Sports & Loisirs</option>
+              <option>Enfants & Jouets</option><option>Alimentation & Boissons</option>
+              <option>Livres & Culture</option><option>Santé & Bien-être</option>
+              <option>Bijoux & Montres</option><option>Téléphonie</option><option>Autres</option>
+            </select>
+          </div>
+          <div class="ag"><label>Prix (FCFA)</label><input type="number" id="empNPrice" placeholder="0"/></div>
+          <div class="ag"><label>Prix barré (FCFA)</label><input type="number" id="empNOldPrice" placeholder="Optionnel"/></div>
+          <div class="ag"><label>Stock</label><input type="number" id="empNStock" placeholder="0"/></div>
+          <div class="ag"><label>Emoji</label><input type="text" id="empNEmoji" placeholder="🛍️" maxlength="2"/></div>
+          <div class="ag full"><label>Description</label><textarea id="empNDesc" placeholder="Description du produit..."></textarea></div>
+        </div>
+        <div class="img-upload-area" style="margin-top:12px" onclick="document.getElementById('empImgInput').click()">
+          <input type="file" id="empImgInput" accept="image/*" multiple onchange="handleEmpImgUpload(event)"/>
+          <div style="font-size:22px;margin-bottom:4px">📸</div>
+          <div style="font-size:12px;color:var(--muted)">Ajouter des images</div>
+        </div>
+        <div class="img-preview" id="empImgPreview"></div>
+        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+          <button class="btn-gold" onclick="empSaveProduct()">Enregistrer</button>
+          <button class="btn-out" id="empCancelEdit" style="display:none;font-size:13px" onclick="empResetForm()">Annuler</button>
+        </div>
+      </div>
+      <div class="stock-tbl-wrap">
+        <table class="stock-tbl">
+          <thead><tr><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Statut</th><th>Actions</th></tr></thead>
+          <tbody id="empStockBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="admin-section" id="emp-sec-stock">
+      <div id="empStockManage"></div>
+    </div>
+    <div class="admin-section" id="emp-sec-coupons">
+      <div class="acard">
+        <h3>Créer un coupon</h3>
+        <div class="add-grid three">
+          <div class="ag"><label>Code</label><input type="text" id="empCpCode" placeholder="PROMO20" style="text-transform:uppercase"/></div>
+          <div class="ag"><label>Type</label><select id="empCpType"><option value="percent">Pourcentage (%)</option><option value="fixed">Montant fixe (FCFA)</option></select></div>
+          <div class="ag"><label>Valeur</label><input type="number" id="empCpValue" placeholder="20"/></div>
+          <div class="ag"><label>Min. commande</label><input type="number" id="empCpMin" placeholder="0"/></div>
+          <div class="ag"><label>Usages max</label><input type="number" id="empCpMax" placeholder="0"/></div>
+          <div class="ag"><label>Description</label><input type="text" id="empCpDesc" placeholder="Description..."/></div>
+        </div>
+        <button class="btn-gold" style="margin-top:12px" onclick="empAddCoupon()">+ Créer le coupon</button>
+      </div>
+      <div id="empCouponList"></div>
+    </div>
+    <div class="admin-section" id="emp-sec-reviews">
+      <div id="empReviewsList"></div>
+    </div>
+  </div>
+</div>
+
+
+
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-box" id="modalBox">
@@ -1252,27 +1574,222 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
 // ══════════════════════════════════════
 // CANVAS BG
 // ══════════════════════════════════════
-(function(){
-  const cv=document.getElementById('bgCanvas'),ctx=cv.getContext('2d');
-  let W,H;
-  function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight}
-  resize();window.addEventListener('resize',resize);
-  const emojis=['🛍️','👜','💍','✨','👑','💎','🌟','🎁','💄','👗','🕯️','💫','🧴','⌚','👞','📦'];
-  const pts=[],flt=[];
-  for(let i=0;i<75;i++) pts.push({x:Math.random()*3000,y:Math.random()*2000,r:Math.random()*2+0.4,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,a:Math.random()*.5+.1,g:Math.random()>.45});
-  for(let i=0;i<16;i++) flt.push({x:Math.random()*3000,y:Math.random()*2000,sz:Math.random()*22+11,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,rot:Math.random()*Math.PI*2,vr:(Math.random()-.5)*.016,a:Math.random()*.18+.04,e:emojis[Math.floor(Math.random()*emojis.length)]});
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
-      const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
-      if(d<125){ctx.beginPath();ctx.strokeStyle=`rgba(245,166,35,${.055*(1-d/125)})`;ctx.lineWidth=.5;ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();}
+// ══════════════════════════════════════
+// ANIMATION CONFIG (persisted)
+// ══════════════════════════════════════
+let animConfig = {
+  type: 'particles',        // particles | stars | bubbles | confetti | images
+  particleCount: 75,
+  floaterCount: 16,
+  speed: 1.0,
+  color1: '#F5A623',
+  color2: '#1A2A64',
+  primaryColor: '#F5A623',
+  secondaryColor: '#1A2A64',
+  bgImages: []              // up to 5 uploaded images for animation
+};
+
+let animRunning = true;
+let animFrameId = null;
+let pts = [], flt = [], bubbles = [], stars2 = [], confettiPts = [];
+
+function initAnimation(){
+  const cv = document.getElementById('bgCanvas');
+  const ctx = cv.getContext('2d');
+  let W, H;
+  function resize(){ W = cv.width = window.innerWidth; H = cv.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+
+  const emojis = ['🛍️','👜','💍','✨','👑','💎','🌟','🎁','💄','👗','🕯️','💫','🧴','⌚','👞','📦'];
+
+  function buildParticles(){
+    pts = []; flt = [];
+    const n = Math.min(animConfig.particleCount, 150);
+    const spd = animConfig.speed;
+    for(let i=0;i<n;i++) pts.push({
+      x:Math.random()*3000, y:Math.random()*2000,
+      r:Math.random()*2+0.4,
+      vx:(Math.random()-.5)*.4*spd, vy:(Math.random()-.5)*.4*spd,
+      a:Math.random()*.5+.1, g:Math.random()>.45
+    });
+    for(let i=0;i<animConfig.floaterCount;i++){
+      const useImg = animConfig.bgImages.length > 0 && Math.random() > 0.4;
+      flt.push({
+        x:Math.random()*3000, y:Math.random()*2000,
+        sz:Math.random()*22+11,
+        vx:(Math.random()-.5)*.5*spd, vy:(Math.random()-.5)*.5*spd,
+        rot:Math.random()*Math.PI*2, vr:(Math.random()-.5)*.016*spd,
+        a:Math.random()*.18+.04,
+        e: useImg ? null : emojis[Math.floor(Math.random()*emojis.length)],
+        imgIdx: useImg ? Math.floor(Math.random()*animConfig.bgImages.length) : -1,
+        imgObj: null
+      });
     }
-    pts.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.g?`rgba(245,166,35,${p.a})`:`rgba(26,42,100,${p.a*.7})`;ctx.fill();p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;});
-    flt.forEach(f=>{ctx.save();ctx.globalAlpha=f.a;ctx.translate(f.x,f.y);ctx.rotate(f.rot);ctx.font=`${f.sz}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(f.e,0,0);ctx.restore();f.x+=f.vx;f.y+=f.vy;f.rot+=f.vr;if(f.x<-60)f.x=W+60;if(f.x>W+60)f.x=-60;if(f.y<-60)f.y=H+60;if(f.y>H+60)f.y=-60;});
-    requestAnimationFrame(draw);
+    // Pre-load images for floaters
+    flt.forEach(f=>{
+      if(f.imgIdx>=0 && animConfig.bgImages[f.imgIdx]){
+        const img = new Image();
+        img.src = animConfig.bgImages[f.imgIdx];
+        f.imgObj = img;
+      }
+    });
+  }
+
+  function buildStars(){
+    stars2 = [];
+    const n = Math.min(animConfig.particleCount*2, 200);
+    for(let i=0;i<n;i++) stars2.push({
+      x:Math.random()*3000, y:Math.random()*2000,
+      r:Math.random()*1.5+0.3,
+      twinkle:Math.random()*Math.PI*2,
+      speed:Math.random()*.02+.005*animConfig.speed
+    });
+  }
+
+  function buildBubbles(){
+    bubbles = [];
+    const n = Math.min(animConfig.particleCount, 80);
+    const spd = animConfig.speed;
+    for(let i=0;i<n;i++) bubbles.push({
+      x:Math.random()*3000, y:Math.random()*2000+2000,
+      r:Math.random()*18+6,
+      vy:-(Math.random()*.6+.3)*spd,
+      vx:(Math.random()-.5)*.2*spd,
+      a:Math.random()*.25+.05
+    });
+  }
+
+  function buildConfetti(){
+    confettiPts = [];
+    const colors=['#F5A623','#FFB84D','#1A2A64','#FF6B35','#FFD700','#E84A0A'];
+    const n = Math.min(animConfig.particleCount, 120);
+    const spd = animConfig.speed;
+    for(let i=0;i<n;i++) confettiPts.push({
+      x:Math.random()*3000, y:Math.random()*2000,
+      w:Math.random()*10+4, h:Math.random()*5+3,
+      rot:Math.random()*Math.PI*2,
+      vx:(Math.random()-.5)*.5*spd, vy:Math.random()*.4*spd+.1,
+      vr:(Math.random()-.5)*.04*spd,
+      color:colors[Math.floor(Math.random()*colors.length)]
+    });
+  }
+
+  function rebuildAll(){
+    buildParticles(); buildStars(); buildBubbles(); buildConfetti();
+  }
+  rebuildAll();
+  // Expose rebuild function globally for settings panel
+  window.rebuildAnimFromConfig = function(){
+    rebuildAll();
+  };
+
+  function draw(){
+    if(!animRunning){ animFrameId=requestAnimationFrame(draw); return; }
+    ctx.clearRect(0,0,W,H);
+    const c1 = animConfig.color1;
+    const c2 = animConfig.color2;
+
+    if(animConfig.type === 'particles'){
+      // Connections
+      for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+        const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
+        if(d<125){
+          ctx.beginPath();
+          ctx.strokeStyle=`${c1}${Math.round(.055*(1-d/125)*255).toString(16).padStart(2,'0')}`;
+          ctx.lineWidth=.5; ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y); ctx.stroke();
+        }
+      }
+      pts.forEach(p=>{
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=p.g?`${c1}${Math.round(p.a*255).toString(16).padStart(2,'0')}`:`${c2}${Math.round(p.a*.7*255).toString(16).padStart(2,'0')}`;
+        ctx.fill();
+        p.x+=p.vx; p.y+=p.vy;
+        if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      });
+      flt.forEach(f=>{
+        ctx.save(); ctx.globalAlpha=f.a; ctx.translate(f.x,f.y); ctx.rotate(f.rot);
+        if(f.imgObj && f.imgObj.complete && f.imgObj.naturalWidth > 0){
+          ctx.drawImage(f.imgObj, -f.sz/2, -f.sz/2, f.sz, f.sz);
+        } else {
+          ctx.font=`${f.sz}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+          ctx.fillText(f.e||'✨',0,0);
+        }
+        ctx.restore();
+        f.x+=f.vx; f.y+=f.vy; f.rot+=f.vr;
+        if(f.x<-60)f.x=W+60; if(f.x>W+60)f.x=-60;
+        if(f.y<-60)f.y=H+60; if(f.y>H+60)f.y=-60;
+      });
+
+    } else if(animConfig.type === 'stars'){
+      stars2.forEach(s=>{
+        s.twinkle += s.speed;
+        const alpha = (Math.sin(s.twinkle)+1)/2*.7+.1;
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.fillStyle=`${c1}${Math.round(alpha*255).toString(16).padStart(2,'0')}`;
+        ctx.fill();
+        // Shooting star occasionally
+        if(Math.random()<.0003){
+          ctx.beginPath(); ctx.moveTo(s.x,s.y);
+          ctx.lineTo(s.x+60,s.y+20);
+          ctx.strokeStyle=c1+'88'; ctx.lineWidth=1; ctx.stroke();
+        }
+      });
+      flt.forEach(f=>{
+        ctx.save(); ctx.globalAlpha=f.a*.6; ctx.translate(f.x,f.y); ctx.rotate(f.rot);
+        ctx.font=`${f.sz*.7}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(f.e||'⭐',0,0); ctx.restore();
+        f.x+=f.vx*.5; f.y+=f.vy*.5; f.rot+=f.vr;
+        if(f.x<0)f.x=W; if(f.x>W)f.x=0; if(f.y<0)f.y=H; if(f.y>H)f.y=0;
+      });
+
+    } else if(animConfig.type === 'bubbles'){
+      bubbles.forEach(b=>{
+        ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+        ctx.strokeStyle=`${c1}${Math.round(b.a*255).toString(16).padStart(2,'0')}`;
+        ctx.lineWidth=1.5; ctx.stroke();
+        // Shine
+        ctx.beginPath(); ctx.arc(b.x-b.r*.3,b.y-b.r*.3,b.r*.2,0,Math.PI*2);
+        ctx.fillStyle=`${c1}33`; ctx.fill();
+        b.y+=b.vy; b.x+=b.vx;
+        if(b.y<-b.r) b.y=H+b.r;
+        if(b.x<0)b.x=W; if(b.x>W)b.x=0;
+      });
+
+    } else if(animConfig.type === 'confetti'){
+      confettiPts.forEach(c=>{
+        ctx.save(); ctx.translate(c.x,c.y); ctx.rotate(c.rot);
+        ctx.fillStyle=c.color; ctx.globalAlpha=.7;
+        ctx.fillRect(-c.w/2,-c.h/2,c.w,c.h);
+        ctx.restore();
+        c.x+=c.vx; c.y+=c.vy; c.rot+=c.vr;
+        if(c.y>H+10) c.y=-10;
+        if(c.x<0)c.x=W; if(c.x>W)c.x=0;
+      });
+
+    } else if(animConfig.type === 'images'){
+      flt.forEach(f=>{
+        ctx.save(); ctx.globalAlpha=f.a; ctx.translate(f.x,f.y); ctx.rotate(f.rot);
+        if(f.imgObj && f.imgObj.complete && f.imgObj.naturalWidth>0){
+          ctx.drawImage(f.imgObj,-f.sz,-f.sz,f.sz*2,f.sz*2);
+        } else {
+          ctx.font=`${f.sz}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+          ctx.fillText(emojis[Math.floor(Math.random()*emojis.length)],0,0);
+        }
+        ctx.restore();
+        f.x+=f.vx; f.y+=f.vy; f.rot+=f.vr;
+        if(f.x<-80)f.x=W+80; if(f.x>W+80)f.x=-80;
+        if(f.y<-80)f.y=H+80; if(f.y>H+80)f.y=-80;
+      });
+    }
+
+    animFrameId = requestAnimationFrame(draw);
   }
   draw();
-})();
+  // Expose rebuild function globally
+  window.rebuildAnimation = rebuildAll;
+}
+
+initAnimation();
 
 // ══════════════════════════════════════
 // DATA
@@ -1322,6 +1839,7 @@ function goPage(n){
   if(n==='checkout')renderCkSummary();
   if(n==='history')renderHistory();
   if(n==='admin'){renderAdmin();}
+  closeMobileMenu();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function goAdminOrLogin(){if(isAdmin)goPage('admin');else goPage('login');}
@@ -1341,6 +1859,23 @@ function doLogin(){
     document.getElementById('loginErr').textContent='Identifiant ou mot de passe incorrect.';
   }
 }
+
+function toggleMobileMenu(){
+  const nav = document.querySelector('.hdr-nav');
+  const btn = document.getElementById('hamburgerBtn');
+  nav.classList.toggle('open');
+  btn.textContent = nav.classList.contains('open') ? '✕' : '☰';
+}
+
+function closeMobileMenu(){
+  const nav = document.querySelector('.hdr-nav');
+  const btn = document.getElementById('hamburgerBtn');
+  if(nav) nav.classList.remove('open');
+  if(btn) btn.textContent = '☰';
+}
+
+// Close menu when navigating
+const origGoPage = goPage;
 
 function showAdminNav(){
   document.getElementById('nb-orders').style.display='flex';
@@ -1389,7 +1924,10 @@ function renderGrid(list){
               <span class="price-main">${fmt(p.price)}</span>
               ${p.oldPrice>0?`<span class="price-old">${fmt(p.oldPrice)}</span>`:''}
             </div>
-            <button class="abtn" ${p.stock===0?'disabled':''} onclick="event.stopPropagation();addToCart(${p.id},1)">+ Panier</button>
+            <div style="display:flex;gap:5px;align-items:center">
+              <button class="abtn" ${p.stock===0?'disabled':''} onclick="event.stopPropagation();addToCart(${p.id},1)">+ Panier</button>
+              <button title="Partager sur WhatsApp" onclick="event.stopPropagation();showShareModal(${p.id})" style="width:30px;height:30px;background:#25D366;border:none;border-radius:var(--r);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">📲</button>
+            </div>
           </div>
         </div>
       </div>`}).join('')
@@ -2129,12 +2667,16 @@ function switchAdminTab(tab){
   if(tab==='orders')renderAdminOrders();
   if(tab==='reviews')renderAdminReviews();
   if(tab==='coupons')renderCouponList();
+  if(tab==='employees'){ renderEmployeesList(); }
+  if(tab==='activity'){ updateActivityFilter(); renderActivityLog(); }
   if(tab==='settings'){
     setTimeout(()=>{
       const lp=document.getElementById('logoPreviewAdmin');
       if(lp)lp.src=LOGO_DATA;
       const waI=document.getElementById('waNumInput');
       if(waI)waI.value=WA;
+      syncSettingsFormToConfig();
+      renderAnimImgPreview();
       // Sync invoice settings to form
       const inv=invoiceSettings;
       const fields={invoiceTheme:inv.theme,invoiceLayout:inv.layout,invoiceLogo:inv.showLogo,invoiceLogoSize:inv.logoSize,invoiceShopName:inv.shopName,invoiceSlogan:inv.slogan,invoiceContact:inv.contact,invoiceFooter:inv.footer,invoiceWatermark:inv.watermark,invoiceBorder:inv.border};
@@ -2664,7 +3206,11 @@ function saveToStorage(){
       LOGO_DATA: LOGO_DATA && LOGO_DATA.length > 100 ? LOGO_DATA : null,
       customIllustration: customIllustration && customIllustration.length < 2000000 ? customIllustration : null,
       fontSize: currentFontSize || 16,
-      adminPass: ADMIN_PASS
+      adminPass: ADMIN_PASS,
+      employees,
+      activityLog: activityLog.slice(0,100),
+      animConfig: {...animConfig, bgImages: animConfig.bgImages.map(img=>img.length<500000?img:'')},
+      shopColors: { gold: animConfig.primaryColor||'#F5A623', gold2: animConfig.secondaryColor||'#1A2A64' }
     };
     localStorage.setItem(LS_KEY, JSON.stringify(data));
   } catch(e){ console.warn('Storage save error:', e); }
@@ -2682,6 +3228,19 @@ function loadFromStorage(){
     if(data.invoiceSettings) invoiceSettings = {...invoiceSettings, ...data.invoiceSettings};
     if(data.WA) WA = data.WA;
     if(data.adminPass) ADMIN_PASS = data.adminPass;
+    if(data.employees) employees = data.employees;
+    if(data.activityLog) activityLog = data.activityLog;
+    if(data.animConfig){
+      Object.assign(animConfig, data.animConfig);
+      setTimeout(()=>{
+        if(typeof rebuildAnimFromConfig === 'function') rebuildAnimFromConfig();
+        syncSettingsFormToConfig();
+      }, 400);
+    }
+    if(data.shopColors){
+      document.documentElement.style.setProperty('--gold', data.shopColors.gold||'#F5A623');
+      document.documentElement.style.setProperty('--gold2', data.shopColors.gold2||'#FFB84D');
+    }
 
     // Restore logo
     if(data.LOGO_DATA && data.LOGO_DATA.length > 100){
@@ -2723,6 +3282,756 @@ function loadFromStorage(){
 }
 
 
+// ═══════════════════════════════════════
+// EMPLOYEE SYSTEM
+// ═══════════════════════════════════════
+let employees = [];
+let activityLog = [];
+let currentEmployee = null;
+let empImages = [];
+
+const ALL_PERMISSIONS = ['orders','products','stock','coupons','reviews'];
+
+// ── Permission toggle UI
+document.addEventListener('click', function(e){
+  const lbl = e.target.closest('#newEmpPerms .perm-item');
+  if(!lbl) return;
+  const cb = lbl.querySelector('input[type=checkbox]');
+  const tog = lbl.querySelector('.perm-toggle');
+  if(!cb || !tog) return;
+  cb.checked = !cb.checked;
+  tog.textContent = cb.checked ? '✓' : '';
+  tog.className = 'perm-toggle' + (cb.checked ? ' on' : '');
+  lbl.className = 'perm-item' + (cb.checked ? ' granted' : '');
+});
+
+// ── Log activity
+function logActivity(empName, action, detail=''){
+  activityLog.unshift({
+    empName, action, detail,
+    time: new Date().toLocaleString('fr-FR'),
+    ts: Date.now()
+  });
+  if(activityLog.length > 200) activityLog = activityLog.slice(0,200);
+  autoSave();
+}
+
+// ── Add employee
+function addEmployee(){
+  const name = document.getElementById('empFullName').value.trim();
+  const username = document.getElementById('empUsername').value.trim().toLowerCase();
+  const password = document.getElementById('empPassword').value;
+  const phone = document.getElementById('empPhone').value.trim();
+  const role = document.getElementById('empRole').value.trim();
+  const color = document.getElementById('empColor').value;
+  if(!name||!username||!password){toast('Remplissez nom, identifiant et mot de passe');return;}
+  if(password.length < 6){toast('Mot de passe trop court (min 6 caractères)');return;}
+  if(employees.find(e=>e.username===username)){toast('Cet identifiant existe déjà');return;}
+  // Get permissions
+  const perms = {};
+  document.querySelectorAll('#newEmpPerms input[type=checkbox]').forEach(cb=>{
+    perms[cb.dataset.perm] = cb.checked;
+  });
+  employees.push({
+    id: Date.now(),
+    name, username, password, phone,
+    role: role || 'Employé',
+    color, perms,
+    createdAt: new Date().toLocaleDateString('fr-FR'),
+    active: true,
+    lastLogin: null
+  });
+  // Reset form
+  ['empFullName','empUsername','empPassword','empPhone','empRole'].forEach(id=>document.getElementById(id).value='');
+  document.querySelectorAll('#newEmpPerms input[type=checkbox]').forEach(cb=>{
+    cb.checked = ['orders','products','stock'].includes(cb.dataset.perm);
+    const tog = cb.closest('.perm-item').querySelector('.perm-toggle');
+    const lbl = cb.closest('.perm-item');
+    if(tog) tog.textContent = cb.checked ? '✓' : '';
+    if(tog) tog.className = 'perm-toggle' + (cb.checked ? ' on' : '');
+    if(lbl) lbl.className = 'perm-item' + (cb.checked ? ' granted' : '');
+  });
+  renderEmployeesList();
+  updateActivityFilter();
+  autoSave();
+  toast('Employé créé avec succès ✓');
+}
+
+// ── Render employees list (admin view)
+function renderEmployeesList(){
+  const w = document.getElementById('employeesList');
+  if(!employees.length){
+    w.innerHTML='<p style="color:var(--muted);font-size:13px;padding:20px">Aucun employé enregistré.</p>';
+    return;
+  }
+  w.innerHTML = employees.map((emp,i)=>`
+    <div class="emp-card">
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <div class="emp-avatar" style="background:${emp.color}">${emp.name.charAt(0).toUpperCase()}</div>
+        <div>
+          <div class="emp-name">${emp.name}</div>
+          <div class="emp-role">${emp.role} &nbsp;·&nbsp; @${emp.username}</div>
+          <div class="emp-phone">📱 +${emp.phone || 'Non défini'}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:3px">
+            Créé le ${emp.createdAt} &nbsp;·&nbsp;
+            ${emp.lastLogin ? 'Dernière connexion: '+emp.lastLogin : 'Jamais connecté'}
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+            ${ALL_PERMISSIONS.map(p=>`
+              <span style="font-size:10px;padding:2px 8px;border-radius:20px;
+                background:${emp.perms[p]?'rgba(42,122,58,0.2)':'rgba(100,100,120,0.15)'};
+                color:${emp.perms[p]?'#ACF0B4':'var(--muted)'}">
+                ${p==='orders'?'Commandes':p==='products'?'Produits':p==='stock'?'Stocks':p==='coupons'?'Coupons':'Avis'}
+              </span>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <span class="emp-badge ${emp.active?'emp-online':'emp-offline'}">${emp.active?'Actif':'Suspendu'}</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="edit-btn" onclick="toggleEmployeeStatus(${i})" style="font-size:11px">
+            ${emp.active?'Suspendre':'Réactiver'}
+          </button>
+          <button class="edit-btn" onclick="editEmployeePerms(${i})" style="font-size:11px">Permissions</button>
+          <button class="del-btn" onclick="deleteEmployee(${i})" style="font-size:11px">Supprimer</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleEmployeeStatus(i){
+  employees[i].active = !employees[i].active;
+  renderEmployeesList();
+  autoSave();
+  toast(employees[i].name + (employees[i].active?' réactivé':' suspendu'));
+}
+
+function deleteEmployee(i){
+  if(!confirm('Supprimer le compte de '+employees[i].name+' ?')) return;
+  employees.splice(i,1);
+  renderEmployeesList();
+  autoSave();
+  toast('Employé supprimé');
+}
+
+function editEmployeePerms(i){
+  const emp = employees[i];
+  const permNames = {orders:'Commandes',products:'Produits',stock:'Stocks',coupons:'Coupons',reviews:'Avis'};
+  document.getElementById('modalContent').innerHTML = `
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 style="font-family:var(--fd);font-size:18px;color:var(--cream);margin-bottom:16px">Permissions — ${emp.name}</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
+      ${ALL_PERMISSIONS.map(p=>`
+        <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--cream);cursor:pointer;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:var(--r);border:1px solid rgba(245,166,35,0.08)">
+          <input type="checkbox" ${emp.perms[p]?'checked':''} id="ep_${p}" style="accent-color:var(--gold);width:16px;height:16px"/>
+          ${permNames[p]}
+        </label>`).join('')}
+    </div>
+    <button class="btn-gold" onclick="saveEmpPerms(${i})">💾 Enregistrer</button>`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function saveEmpPerms(i){
+  ALL_PERMISSIONS.forEach(p=>{
+    const cb = document.getElementById('ep_'+p);
+    if(cb) employees[i].perms[p] = cb.checked;
+  });
+  closeModal();
+  renderEmployeesList();
+  autoSave();
+  toast('Permissions mises à jour ✓');
+}
+
+// ── Activity Log
+function renderActivityLog(){
+  const filter = document.getElementById('activityFilter') ? document.getElementById('activityFilter').value : 'all';
+  const w = document.getElementById('activityLog');
+  let logs = activityLog;
+  if(filter !== 'all') logs = logs.filter(l=>l.empName===filter);
+  if(!logs.length){
+    w.innerHTML='<p style="color:var(--muted);font-size:13px;padding:20px">Aucune activité enregistrée.</p>';
+    return;
+  }
+  const icons = {
+    'Connexion':'🔐','Déconnexion':'🚪','Produit ajouté':'📦','Produit modifié':'✏️',
+    'Stock mis à jour':'📊','Commande mise à jour':'📋','Coupon créé':'🎟️','Coupon supprimé':'🗑️'
+  };
+  w.innerHTML = logs.map(l=>`
+    <div class="activity-item">
+      <span class="activity-icon">${icons[l.action]||'📌'}</span>
+      <div style="flex:1">
+        <div class="activity-text"><strong>${l.empName}</strong> — ${l.action}</div>
+        ${l.detail?`<div class="activity-meta">${l.detail}</div>`:''}
+        <div class="activity-meta">${l.time}</div>
+      </div>
+    </div>`).join('');
+}
+
+function updateActivityFilter(){
+  const sel = document.getElementById('activityFilter');
+  if(!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="all">Tous les employés</option>' +
+    employees.map(e=>`<option value="${e.name}" ${cur===e.name?'selected':''}>${e.name}</option>`).join('');
+}
+
+function clearActivityLog(){
+  if(!confirm('Effacer tout le journal ?')) return;
+  activityLog = [];
+  renderActivityLog();
+  autoSave();
+  toast('Journal effacé');
+}
+
+// ── EMPLOYEE AUTH
+function doEmpLogin(){
+  const u = document.getElementById('empLoginUser').value.trim().toLowerCase();
+  const p = document.getElementById('empLoginPass').value;
+  const emp = employees.find(e=>e.username===u && e.password===p && e.active);
+  if(!emp){
+    document.getElementById('empLoginErr').textContent = 'Identifiant ou mot de passe incorrect, ou compte suspendu.';
+    return;
+  }
+  currentEmployee = emp;
+  emp.lastLogin = new Date().toLocaleString('fr-FR');
+  logActivity(emp.name, "Connexion", "Connexion à l'espace employé");
+  document.getElementById('empLoginErr').textContent = '';
+  // Setup employee panel
+  document.getElementById('empPanelTitle').textContent = 'Espace Employé — '+emp.name;
+  document.getElementById('empPanelSub').textContent = emp.role + ' · Connecté le ' + emp.lastLogin;
+  document.getElementById('empSessionName').textContent = emp.name;
+  document.getElementById('empSessionTime').textContent = 'Connexion: '+emp.lastLogin;
+  // Build tabs based on permissions
+  buildEmpTabs(emp);
+  autoSave();
+  goPage('emp-panel');
+  // Show first allowed tab
+  const firstPerm = ALL_PERMISSIONS.find(p=>emp.perms[p]);
+  if(firstPerm) switchEmpTab(firstPerm);
+}
+
+function doEmpLogout(){
+  if(currentEmployee){
+    logActivity(currentEmployee.name, 'Déconnexion', '');
+    currentEmployee = null;
+  }
+  goPage('home');
+  toast('Déconnecté');
+}
+
+function buildEmpTabs(emp){
+  const tabLabels = {
+    orders:'📋 Commandes', products:'📦 Produits',
+    stock:'📊 Stocks', coupons:'🎟️ Coupons', reviews:'⭐ Avis'
+  };
+  const tabs = document.getElementById('empTabs');
+  tabs.innerHTML = ALL_PERMISSIONS
+    .filter(p=>emp.perms[p])
+    .map((p,i)=>`<button class="atab ${i===0?'active':''}" id="emptab-${p}" onclick="switchEmpTab('${p}')">${tabLabels[p]}</button>`)
+    .join('');
+}
+
+function switchEmpTab(tab){
+  document.querySelectorAll('#empTabs .atab').forEach(b=>b.classList.remove('active'));
+  const tabBtn = document.getElementById('emptab-'+tab);
+  if(tabBtn) tabBtn.classList.add('active');
+  document.querySelectorAll('#page-emp-panel .admin-section').forEach(s=>s.classList.remove('active'));
+  const sec = document.getElementById('emp-sec-'+tab);
+  if(sec) sec.classList.add('active');
+  if(tab==='orders') renderEmpOrders();
+  if(tab==='products') renderEmpProducts();
+  if(tab==='stock') renderEmpStock();
+  if(tab==='coupons') renderEmpCoupons();
+  if(tab==='reviews') renderEmpReviews();
+}
+
+// ── EMPLOYEE ORDERS
+function renderEmpOrders(){
+  const w = document.getElementById('empOrdersList');
+  if(!orders.length){w.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Aucune commande reçue.</div>';return;}
+  const total_rev = orders.reduce((s,o)=>s+o.total,0);
+  w.innerHTML = `<div class="stats-grid" style="margin-bottom:18px">
+    <div class="stat"><div class="stat-n">${orders.length}</div><div class="stat-l">Commandes</div></div>
+    <div class="stat"><div class="stat-n" style="font-size:18px;color:var(--gold2)">${fmt(total_rev)}</div><div class="stat-l">Chiffre d'affaires</div></div>
+  </div>` +
+  orders.map((o,i)=>`
+    <div class="h-card" style="margin-bottom:10px">
+      <div class="h-hdr" onclick="toggleEmpOrder(${i})">
+        <div>
+          <div class="hnum">${o.num}</div>
+          <div class="hdate">${o.date} · ${o.delivery.name} · ${o.payment}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <select style="background:var(--dark2);border:1px solid rgba(245,166,35,0.2);color:var(--cream);font-size:11px;padding:4px 8px;border-radius:var(--r)" 
+            onchange="empUpdateOrderStatus(${i},this.value)" onclick="event.stopPropagation()">
+            <option ${o.status==='Confirmée'?'selected':''}>Confirmée</option>
+            <option ${o.status==='En préparation'?'selected':''}>En préparation</option>
+            <option ${o.status==='Expédiée'?'selected':''}>Expédiée</option>
+            <option ${o.status==='Livrée'?'selected':''}>Livrée</option>
+            <option ${o.status==='Annulée'?'selected':''}>Annulée</option>
+          </select>
+          <span class="htotal">${fmt(o.total)}</span>
+          <button class="pdf-btn" onclick="event.stopPropagation();empContactClient(orders[${i}])" style="font-size:11px;padding:5px 12px">📲 WhatsApp</button>
+        </div>
+      </div>
+      <div class="h-body" id="empob-${i}">
+        ${o.items.map(it=>`<div class="hitem"><span>${it.emoji} ${it.name} ×${it.qty}</span><span>${fmt(it.total)}</span></div>`).join('')}
+        <div class="hdelivery">📦 ${o.delivery.name} · ${o.delivery.city}, ${o.delivery.address}<br>📞 ${o.delivery.phone}</div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleEmpOrder(i){const el=document.getElementById('empob-'+i);if(el)el.classList.toggle('open');}
+
+function empUpdateOrderStatus(i, status){
+  if(orders[i]){
+    orders[i].status = status;
+    logActivity(currentEmployee.name, 'Commande mise à jour', `N° ${orders[i].num} → ${status}`);
+    autoSave();
+    toast('Statut mis à jour : '+status);
+  }
+}
+
+function empContactClient(o){
+  const empPhone = currentEmployee ? currentEmployee.phone : WA;
+  const msg = 'Bonjour '+o.delivery.name+' ! Votre commande MC-STORE N° '+o.num+' est actuellement : *'+o.status+'*. Pour toute question contactez-nous.';
+  // Send to both: client and also notify boss on main WA
+  window.open('https://wa.me/'+o.delivery.phone.replace(/\D/g,'')+'?text='+encodeURIComponent(msg),'_blank');
+}
+
+// ── EMPLOYEE PRODUCTS
+let empNewImages = [];
+function handleEmpImgUpload(e){
+  Array.from(e.target.files).forEach(f=>{
+    const r=new FileReader();
+    r.onload=ev=>{empNewImages.push(ev.target.result);renderEmpImgPreview();};
+    r.readAsDataURL(f);
+  });
+  e.target.value='';
+}
+function renderEmpImgPreview(){
+  document.getElementById('empImgPreview').innerHTML=empNewImages.map((src,i)=>`
+    <div class="img-prev-item"><img src="${src}"/><button class="img-prev-del" onclick="empRemoveImg(${i})">✕</button></div>`).join('');
+}
+function empRemoveImg(i){empNewImages.splice(i,1);renderEmpImgPreview();}
+
+function empSaveProduct(){
+  const nm=document.getElementById('empNName').value.trim();
+  const ct=document.getElementById('empNCat').value;
+  const pr=parseInt(document.getElementById('empNPrice').value)||0;
+  const op=parseInt(document.getElementById('empNOldPrice').value)||0;
+  const st=parseInt(document.getElementById('empNStock').value)||0;
+  const em=document.getElementById('empNEmoji').value.trim()||'🛍️';
+  const ds=document.getElementById('empNDesc').value.trim();
+  if(!nm||!pr){toast('Remplissez au moins le nom et le prix');return;}
+  const editId=document.getElementById('empEditingId').value;
+  if(editId){
+    const p=products.find(x=>x.id==editId);
+    if(p){p.name=nm;p.cat=ct;p.price=pr;p.oldPrice=op;p.stock=st;p.emoji=em;p.desc=ds||p.desc;if(empNewImages.length)p.images=[...empNewImages];}
+    logActivity(currentEmployee.name,'Produit modifié',nm);
+    toast('Produit mis à jour ✓');
+  } else {
+    products.push({id:nextId++,name:nm,cat:ct,price:pr,oldPrice:op,emoji:em,stock:st,desc:ds||'Produit MC-STORE.',specs:[],isNew:true,images:[...empNewImages],reviews:[],videoUrl:'',videoBlob:''});
+    logActivity(currentEmployee.name,'Produit ajouté',nm);
+    toast('Produit ajouté ✓');
+  }
+  empResetForm();renderEmpProducts();renderGrid(products);renderSidebarCats();autoSave();
+}
+
+function empResetForm(){
+  ['empNName','empNPrice','empNOldPrice','empNStock','empNEmoji','empNDesc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('empNCat').value='';
+  document.getElementById('empEditingId').value='';
+  document.getElementById('empAddFormTitle').textContent='Ajouter un produit';
+  document.getElementById('empCancelEdit').style.display='none';
+  empNewImages=[];renderEmpImgPreview();
+}
+
+function empEditProduct(id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  document.getElementById('empNName').value=p.name;
+  document.getElementById('empNCat').value=p.cat||'';
+  document.getElementById('empNPrice').value=p.price;
+  document.getElementById('empNOldPrice').value=p.oldPrice||'';
+  document.getElementById('empNStock').value=p.stock;
+  document.getElementById('empNEmoji').value=p.emoji;
+  document.getElementById('empNDesc').value=p.desc;
+  document.getElementById('empEditingId').value=id;
+  document.getElementById('empAddFormTitle').textContent='Modifier : '+p.name;
+  document.getElementById('empCancelEdit').style.display='inline-flex';
+  empNewImages=[...p.images];renderEmpImgPreview();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderEmpProducts(){
+  document.getElementById('empStockBody').innerHTML=products.map(p=>`
+    <tr>
+      <td>${p.images&&p.images.length?`<img src="${p.images[0]}" style="width:28px;height:28px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:4px"/>`:p.emoji} ${p.name}</td>
+      <td style="color:var(--muted)">${p.cat||'—'}</td>
+      <td>${fmt(p.price)}</td>
+      <td><input type="number" class="sqty" value="${p.stock}" min="0" onchange="empUpdateStock(${p.id},this.value)"/></td>
+      <td><span class="stag ${SC(p.stock)}" style="position:static">${SL(p.stock)}</span></td>
+      <td><button class="edit-btn" onclick="empEditProduct(${p.id})">Modifier</button></td>
+    </tr>`).join('');
+}
+
+function empUpdateStock(id,v){
+  const p=products.find(x=>x.id===id);
+  if(p){
+    p.stock=Math.max(0,parseInt(v)||0);
+    logActivity(currentEmployee.name,'Stock mis à jour',p.name+' → '+p.stock+' unités');
+    renderEmpProducts();autoSave();toast('Stock mis à jour');
+  }
+}
+
+function renderEmpStock(){
+  document.getElementById('empStockManage').innerHTML=`
+    <div class="stats-grid" style="margin-bottom:18px">
+      <div class="stat"><div class="stat-n">${products.length}</div><div class="stat-l">Produits</div></div>
+      <div class="stat"><div class="stat-n" style="color:#FFB0B0">${products.filter(p=>p.stock===0).length}</div><div class="stat-l">Ruptures</div></div>
+      <div class="stat"><div class="stat-n" style="color:#FFD980">${products.filter(p=>p.stock>0&&p.stock<=3).length}</div><div class="stat-l">Stock faible</div></div>
+    </div>
+    <div class="stock-tbl-wrap">
+      <table class="stock-tbl">
+        <thead><tr><th>Produit</th><th>Stock actuel</th><th>Statut</th><th>Modifier</th></tr></thead>
+        <tbody>${products.map(p=>`
+          <tr>
+            <td>${p.emoji} ${p.name}</td>
+            <td><input type="number" class="sqty" value="${p.stock}" min="0" onchange="empUpdateStock(${p.id},this.value)"/></td>
+            <td><span class="stag ${SC(p.stock)}" style="position:static">${SL(p.stock)}</span></td>
+            <td style="color:var(--muted);font-size:12px">${p.cat||'—'}</td>
+          </tr>`).join('')}</tbody>
+      </table>
+    </div>`;
+}
+
+function empAddCoupon(){
+  const code=document.getElementById('empCpCode').value.trim().toUpperCase();
+  const type=document.getElementById('empCpType').value;
+  const value=parseFloat(document.getElementById('empCpValue').value)||0;
+  const min=parseFloat(document.getElementById('empCpMin').value)||0;
+  const max=parseInt(document.getElementById('empCpMax').value)||0;
+  const desc=document.getElementById('empCpDesc').value.trim();
+  if(!code||!value){toast('Remplissez le code et la valeur');return;}
+  if(coupons.find(c=>c.code===code)){toast('Ce code existe déjà');return;}
+  coupons.push({code,type,value,min,max,used:0,active:true,desc});
+  ['empCpCode','empCpValue','empCpMin','empCpMax','empCpDesc'].forEach(id=>document.getElementById(id).value='');
+  logActivity(currentEmployee.name,'Coupon créé',code+' ('+value+(type==='percent'?'%':' FCFA')+')');
+  renderEmpCoupons();autoSave();toast('Coupon créé ✓');
+}
+
+function renderEmpCoupons(){
+  const w=document.getElementById('empCouponList');
+  w.innerHTML=coupons.length?coupons.map((c,i)=>`
+    <div class="coupon-item">
+      <div>
+        <div class="coupon-code">${c.code}</div>
+        <div class="coupon-info">${c.type==='percent'?'-'+c.value+'%':'-'+fmt(c.value)} ${c.min>0?'· Min: '+fmt(c.min):''}</div>
+        <div class="coupon-info" style="font-style:italic">${c.desc}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="coupon-badge ${c.active?'':'inactive'}">${c.active?'Actif':'Inactif'}</span>
+        <button class="toggle-btn" onclick="empToggleCoupon(${i})">${c.active?'Désactiver':'Activer'}</button>
+      </div>
+    </div>`).join(''):'<p style="color:var(--muted);font-size:13px;padding:20px">Aucun coupon.</p>';
+}
+
+function empToggleCoupon(i){
+  coupons[i].active=!coupons[i].active;
+  renderEmpCoupons();autoSave();
+  toast('Coupon '+(coupons[i].active?'activé':'désactivé'));
+}
+
+function renderEmpReviews(){
+  const allRv=[];
+  products.forEach(p=>p.reviews.forEach(r=>allRv.push({...r,product:p.name})));
+  siteReviews.forEach(r=>allRv.push({...r,product:'MC-STORE (site)'}));
+  const w=document.getElementById('empReviewsList');
+  if(!allRv.length){w.innerHTML='<p style="color:var(--muted);font-size:13px;padding:20px">Aucun avis.</p>';return;}
+  w.innerHTML=allRv.map(r=>`
+    <div class="rv-item">
+      <div class="rv-item-head">
+        <div><span class="rv-author">${r.name}</span>${r.city?` — ${r.city}`:''} <span style="font-size:10px;color:var(--gold);margin-left:6px">[${r.product}]</span></div>
+        <span class="rv-date">${r.date}</span>
+      </div>
+      ${r.comment?`<div class="rv-comment">${r.comment}</div>`:''}
+      <div style="font-size:11px;color:var(--muted)">👍 ${r.likes||0} · 👎 ${r.dislikes||0}</div>
+    </div>`).join('');
+}
+
+// ── Update saveToStorage to include employees + activity
+
+// ═══════════════════════════════
+// MOBILE SIDEBAR
+// ═══════════════════════════════
+function openSidebar(){
+  document.querySelector('.sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSidebar(){
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// ═══════════════════════════════
+// PRODUCT SHARE - WHATSAPP
+// ═══════════════════════════════
+function getProductShareData(id){
+  const p = products.find(x=>x.id===id);
+  if(!p) return null;
+  const baseUrl = window.location.href.split('?')[0].split('#')[0];
+  const productUrl = baseUrl + '?product=' + id;
+  const msg = '🛍️ *MC-STORE*\n\n*' + p.name + '*\n' +
+    (p.cat ? '📂 ' + p.cat + '\n' : '') +
+    '💰 Prix : *' + fmt(p.price) + '*' +
+    (p.oldPrice>0 ? ' ~~' + fmt(p.oldPrice) + '~~' : '') + '\n' +
+    (p.desc ? '\n' + p.desc.slice(0,120) + '...\n' : '') +
+    '\n🔗 Voir le produit : ' + productUrl + '\n\n' +
+    'MC-STORE - Les bonnes trouvailles, au bon moment.';
+  return { p, productUrl, msg };
+}
+
+function shareProductWA(id){
+  const d = getProductShareData(id);
+  if(!d) return;
+  window.open('https://wa.me/?text=' + encodeURIComponent(d.msg), '_blank');
+}
+
+function shareCurrentProduct(){
+  if(curDetail) showShareModal(curDetail.id);
+}
+
+function shareProductFromCard(id){
+  showShareModal(id);
+}
+
+function showShareModal(id){
+  const d = getProductShareData(id);
+  if(!d) return;
+  const {p, productUrl, msg} = d;
+  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  const fbUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(productUrl) + '&quote=' + encodeURIComponent(p.name + ' - ' + fmt(p.price));
+  const twUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent('🛍️ ' + p.name + ' - ' + fmt(p.price) + ' sur MC-STORE') + '&url=' + encodeURIComponent(productUrl);
+  const tgUrl = 'https://t.me/share/url?url=' + encodeURIComponent(productUrl) + '&text=' + encodeURIComponent('🛍️ ' + p.name + ' - ' + fmt(p.price));
+  const liUrl = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(productUrl);
+
+  document.getElementById('modalContent').innerHTML = `
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 style="font-family:var(--fd);font-size:18px;color:var(--cream);margin-bottom:6px">Partager ce produit</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">${p.name}</p>
+
+    <!-- Link copy -->
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <input id="shareLinkInput" type="text" value="${productUrl}" readonly
+        style="flex:1;font-family:monospace;font-size:11px;color:var(--gold2);background:rgba(255,255,255,0.04);border:1px solid rgba(245,166,35,0.2);border-radius:var(--r);padding:8px 10px;outline:none"/>
+      <button onclick="copyShareLink()" style="padding:8px 14px;background:var(--gold);color:var(--dark);border:none;border-radius:var(--r);cursor:pointer;font-size:12px;font-family:var(--fb);white-space:nowrap;font-weight:500">
+        📋 Copier
+      </button>
+    </div>
+    <div id="copyConfirm" style="font-size:12px;color:#ACF0B4;margin-bottom:14px;display:none">✓ Lien copié !</div>
+
+    <!-- Share buttons -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <a href="${waUrl}" target="_blank" onclick="closeModal()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#25D366;border-radius:var(--r);text-decoration:none;color:white;font-size:13px;font-weight:500;font-family:var(--fb)">
+        <span style="font-size:20px">📱</span> WhatsApp
+      </a>
+      <a href="${fbUrl}" target="_blank" onclick="closeModal()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#1877F2;border-radius:var(--r);text-decoration:none;color:white;font-size:13px;font-weight:500;font-family:var(--fb)">
+        <span style="font-size:20px">👤</span> Facebook
+      </a>
+      <a href="${tgUrl}" target="_blank" onclick="closeModal()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#229ED9;border-radius:var(--r);text-decoration:none;color:white;font-size:13px;font-weight:500;font-family:var(--fb)">
+        <span style="font-size:20px">✈️</span> Telegram
+      </a>
+      <a href="${twUrl}" target="_blank" onclick="closeModal()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#1DA1F2;border-radius:var(--r);text-decoration:none;color:white;font-size:13px;font-weight:500;font-family:var(--fb)">
+        <span style="font-size:20px">🐦</span> Twitter/X
+      </a>
+      <a href="${liUrl}" target="_blank" onclick="closeModal()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#0A66C2;border-radius:var(--r);text-decoration:none;color:white;font-size:13px;font-weight:500;font-family:var(--fb)">
+        <span style="font-size:20px">💼</span> LinkedIn
+      </a>
+      <button onclick="shareNative('${productUrl}','${p.name}','${fmt(p.price)}')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(245,166,35,0.15);border:1px solid rgba(245,166,35,0.3);border-radius:var(--r);cursor:pointer;color:var(--gold);font-size:13px;font-weight:500;font-family:var(--fb)">
+        <span style="font-size:20px">📤</span> Autres apps
+      </button>
+    </div>`;
+
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function copyShareLink(){
+  const inp = document.getElementById('shareLinkInput');
+  if(!inp) return;
+  navigator.clipboard.writeText(inp.value).then(()=>{
+    const c = document.getElementById('copyConfirm');
+    if(c){ c.style.display='block'; setTimeout(()=>c.style.display='none', 2500); }
+    toast('Lien copié ✓');
+  }).catch(()=>{
+    inp.select(); document.execCommand('copy');
+    toast('Lien copié ✓');
+  });
+}
+
+function shareNative(url, name, price){
+  if(navigator.share){
+    navigator.share({ title:'MC-STORE — '+name, text:'🛍️ '+name+' — '+price+' sur MC-STORE', url });
+  } else {
+    copyShareLink();
+    toast('Lien copié — collez-le dans votre application');
+  }
+}
+
+// Auto-open product from URL param
+function checkProductParam(){
+  const params = new URLSearchParams(window.location.search);
+  const pid = params.get('product');
+  if(pid){
+    const p = products.find(x=>x.id==pid);
+    if(p){ setTimeout(()=>openDetail(p.id), 300); }
+  }
+}
+
+// ═══════════════════════════════
+// ANIMATION SETTINGS CONTROLS
+// ═══════════════════════════════
+function syncColorInput(colorId, hexId){
+  const colorEl = document.getElementById(colorId);
+  const hexEl = document.getElementById(hexId);
+  if(!colorEl || !hexEl) return;
+  const val = document.activeElement === hexEl ? hexEl.value : colorEl.value;
+  if(/^#[0-9A-Fa-f]{6}$/.test(val)){
+    colorEl.value = val;
+    hexEl.value = val;
+  }
+}
+
+function previewAnim(){
+  const type = document.getElementById('animType') ? document.getElementById('animType').value : animConfig.type;
+  const speed = parseFloat(document.getElementById('animSpeed') ? document.getElementById('animSpeed').value : animConfig.speed);
+  const count = parseInt(document.getElementById('animCount') ? document.getElementById('animCount').value : animConfig.particleCount);
+  const c1 = document.getElementById('animColor1') ? document.getElementById('animColor1').value : animConfig.color1;
+  const c2 = document.getElementById('animColor2') ? document.getElementById('animColor2').value : animConfig.color2;
+  // Show/hide image upload section
+  const imgSec = document.getElementById('animImagesSection');
+  if(imgSec) imgSec.style.display = type === 'images' ? 'block' : 'none';
+  // Live update animConfig
+  animConfig.type = type;
+  animConfig.speed = speed;
+  animConfig.particleCount = count;
+  animConfig.floaterCount = Math.round(count / 5);
+  animConfig.color1 = c1;
+  animConfig.color2 = c2;
+  if(typeof rebuildAnimFromConfig === 'function') rebuildAnimFromConfig();
+}
+
+function previewShopColors(){
+  const c1 = document.getElementById('shopColor1') ? document.getElementById('shopColor1').value : '#F5A623';
+  const c2 = document.getElementById('shopColor2') ? document.getElementById('shopColor2').value : '#1A2A64';
+  document.documentElement.style.setProperty('--gold', c1);
+  document.documentElement.style.setProperty('--gold2', c1+'BB');
+  document.documentElement.style.setProperty('--dark2', c2);
+  animConfig.primaryColor = c1;
+  animConfig.secondaryColor = c2;
+}
+
+function applyAnimSettings(){
+  previewAnim();
+  previewShopColors();
+  autoSave();
+  toast('Animations et couleurs appliquées ✓');
+}
+
+function resetAnimSettings(){
+  animConfig.type = 'particles';
+  animConfig.speed = 1.0;
+  animConfig.particleCount = 75;
+  animConfig.floaterCount = 16;
+  animConfig.color1 = '#F5A623';
+  animConfig.color2 = '#1A2A64';
+  animConfig.primaryColor = '#F5A623';
+  animConfig.secondaryColor = '#1A2A64';
+  animConfig.bgImages = [];
+  document.documentElement.style.setProperty('--gold', '#F5A623');
+  document.documentElement.style.setProperty('--gold2', '#FFB84D');
+  document.documentElement.style.setProperty('--dark2', '#1A2A64');
+  syncSettingsFormToConfig();
+  if(typeof rebuildAnimFromConfig === 'function') rebuildAnimFromConfig();
+  autoSave();
+  toast('Animation réinitialisée ✓');
+}
+
+function syncSettingsFormToConfig(){
+  const fields = {
+    'animType': animConfig.type,
+    'animColor1': animConfig.color1,
+    'animColor1Hex': animConfig.color1,
+    'animColor2': animConfig.color2,
+    'animColor2Hex': animConfig.color2,
+    'shopColor1': animConfig.primaryColor||'#F5A623',
+    'shopColor1Hex': animConfig.primaryColor||'#F5A623',
+    'shopColor2': animConfig.secondaryColor||'#1A2A64',
+    'shopColor2Hex': animConfig.secondaryColor||'#1A2A64',
+  };
+  Object.entries(fields).forEach(([id,val])=>{ const el=document.getElementById(id); if(el)el.value=val; });
+  const spEl = document.getElementById('animSpeed');
+  if(spEl){ spEl.value=animConfig.speed; document.getElementById('speedValLabel').textContent=animConfig.speed.toFixed(1); }
+  const ctEl = document.getElementById('animCount');
+  if(ctEl){ ctEl.value=animConfig.particleCount; document.getElementById('countValLabel').textContent=animConfig.particleCount; }
+  const imgSec = document.getElementById('animImagesSection');
+  if(imgSec) imgSec.style.display = animConfig.type==='images' ? 'block' : 'none';
+}
+
+function handleAnimImages(e){
+  const files = Array.from(e.target.files).slice(0, 5 - animConfig.bgImages.length);
+  files.forEach(f=>{
+    if(animConfig.bgImages.length >= 5){ toast('Maximum 5 images'); return; }
+    const r = new FileReader();
+    r.onload = ev => {
+      animConfig.bgImages.push(ev.target.result);
+      renderAnimImgPreview();
+      if(typeof rebuildAnimFromConfig === 'function') rebuildAnimFromConfig();
+    };
+    r.readAsDataURL(f);
+  });
+  e.target.value='';
+}
+
+function renderAnimImgPreview(){
+  const wrap = document.getElementById('animImgPreview');
+  if(!wrap) return;
+  wrap.innerHTML = animConfig.bgImages.map((src,i)=>`
+    <div class="img-prev-item">
+      <img src="${src}" style="width:60px;height:60px;object-fit:cover;border-radius:var(--r);border:1px solid rgba(245,166,35,0.2)"/>
+      <button class="img-prev-del" onclick="removeAnimImg(${i})">✕</button>
+    </div>`).join('');
+}
+
+function removeAnimImg(i){
+  animConfig.bgImages.splice(i,1);
+  renderAnimImgPreview();
+  if(typeof rebuildAnimFromConfig === 'function') rebuildAnimFromConfig();
+}
+
+// Theme presets
+const THEME_PRESETS = {
+  orange:  { c1:'#F5A623', c2:'#FFB84D', s1:'#F5A623', s2:'#1A2A64' },
+  gold:    { c1:'#FFD700', c2:'#B8860B', s1:'#FFD700', s2:'#111111' },
+  purple:  { c1:'#9B59B6', c2:'#6C3483', s1:'#9B59B6', s2:'#2C0D4A' },
+  green:   { c1:'#27AE60', c2:'#1E8449', s1:'#27AE60', s2:'#0D3B1E' },
+  red:     { c1:'#E74C3C', c2:'#C0392B', s1:'#E74C3C', s2:'#4A0A05' },
+  blue:    { c1:'#2980B9', c2:'#1A5276', s1:'#2980B9', s2:'#0A1A2E' }
+};
+
+function applyThemePreset(name){
+  const t = THEME_PRESETS[name];
+  if(!t) return;
+  animConfig.color1 = t.c1; animConfig.color2 = t.c2;
+  animConfig.primaryColor = t.s1; animConfig.secondaryColor = t.s2;
+  syncSettingsFormToConfig();
+  previewShopColors();
+  if(typeof rebuildAnimFromConfig === 'function') rebuildAnimFromConfig();
+  autoSave();
+  toast('Thème appliqué ✓');
+}
+
 function autoSave(){
   saveToStorage();
 }
@@ -2737,6 +4046,7 @@ renderSiteReviews();
 applyFilters();
 addSpecRow();
 renderFeaturedVideos();
+checkProductParam();
 // Set logo in admin preview on load
 setTimeout(()=>{
   const lp=document.getElementById('logoPreviewAdmin');
