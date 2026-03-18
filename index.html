@@ -3195,40 +3195,68 @@ function saveToStorage(){
     const customImg = document.getElementById('heroCustomImg');
     const customIllustration = customImg && customImg.style.display!=='none' && customImg.src ? customImg.src : null;
     const waDispEl = document.getElementById('waNumDisplay');
-    const data = {
-      products: products.map(p=>({...p, videoBlob:''})),
+
+    // ── MAIN DATA (lightweight, always saved)
+    const mainData = {
+      products: products.map(p=>({...p, videoBlob:'', images:[]})),
       coupons,
       orders,
       siteReviews,
       invoiceSettings,
       WA,
       waDisplay: waDispEl ? waDispEl.textContent : null,
-      LOGO_DATA: LOGO_DATA && LOGO_DATA.length > 100 ? LOGO_DATA : null,
-      customIllustration: customIllustration && customIllustration.length < 2000000 ? customIllustration : null,
       fontSize: currentFontSize || 16,
       adminPass: ADMIN_PASS,
-      employees,
-      activityLog: activityLog.slice(0,100),
-      animConfig: {...animConfig, bgImages: animConfig.bgImages.map(img=>img.length<500000?img:'')},
-      shopColors: { gold: animConfig.primaryColor||'#F5A623', gold2: animConfig.secondaryColor||'#1A2A64' }
+      employees: employees.map(e=>({...e})),
+      activityLog: activityLog.slice(0,50),
+      animConfig: {...animConfig, bgImages:[]},
+      shopColors: { gold: animConfig.primaryColor||'#F5A623', gold2: animConfig.secondaryColor||'#1A2A64' },
+      savedAt: Date.now()
     };
-    localStorage.setItem(LS_KEY, JSON.stringify(data));
-  } catch(e){ console.warn('Storage save error:', e); }
+    localStorage.setItem(LS_KEY, JSON.stringify(mainData));
+
+    // ── IMAGES (saved separately to avoid quota)
+    try{
+      const imgData = {
+        productImages: products.map(p=>({id:p.id, images:p.images||[]})),
+        LOGO_DATA: LOGO_DATA && LOGO_DATA.length > 100 ? LOGO_DATA : null,
+        customIllustration: customIllustration && customIllustration.length < 1500000 ? customIllustration : null,
+        animBgImages: animConfig.bgImages.filter(img=>img.length < 300000)
+      };
+      localStorage.setItem(LS_KEY+'_imgs', JSON.stringify(imgData));
+    } catch(imgErr){
+      console.warn('Images storage full, skipping images:', imgErr.message);
+    }
+
+  } catch(e){
+    console.error('Storage save error:', e.message);
+    // Try saving just the critical data
+    try{
+      const critical = { WA, products: products.map(p=>({...p,images:[],videoBlob:''})), coupons, orders, employees, adminPass: ADMIN_PASS, savedAt: Date.now() };
+      localStorage.setItem(LS_KEY+'_critical', JSON.stringify(critical));
+    } catch(e2){ console.error('Critical save also failed:', e2.message); }
+  }
 }
 
 function loadFromStorage(){
   try{
+    // ── Load main data
     const raw = localStorage.getItem(LS_KEY);
-    if(!raw) return;
-    const data = JSON.parse(raw);
+    // Also check critical backup
+    const rawCritical = localStorage.getItem(LS_KEY+'_critical');
+
+    if(!raw && !rawCritical){ console.log('No saved data found'); return; }
+
+    const data = raw ? JSON.parse(raw) : JSON.parse(rawCritical);
+
     if(data.products && data.products.length) products = data.products;
-    if(data.coupons) coupons = data.coupons;
-    if(data.orders) orders = data.orders;
+    if(data.coupons && data.coupons.length) coupons = data.coupons;
+    if(data.orders && data.orders.length) orders = data.orders;
     if(data.siteReviews) siteReviews = data.siteReviews;
     if(data.invoiceSettings) invoiceSettings = {...invoiceSettings, ...data.invoiceSettings};
     if(data.WA) WA = data.WA;
     if(data.adminPass) ADMIN_PASS = data.adminPass;
-    if(data.employees) employees = data.employees;
+    if(data.employees && data.employees.length) employees = data.employees;
     if(data.activityLog) activityLog = data.activityLog;
     if(data.animConfig){
       Object.assign(animConfig, data.animConfig);
@@ -3242,18 +3270,47 @@ function loadFromStorage(){
       document.documentElement.style.setProperty('--gold2', data.shopColors.gold2||'#FFB84D');
     }
 
-    // Restore logo
-    if(data.LOGO_DATA && data.LOGO_DATA.length > 100){
-      LOGO_DATA = data.LOGO_DATA;
-      setTimeout(()=>{
-        const hl = document.getElementById('headerLogo');
-        if(hl) hl.src = LOGO_DATA;
-        const lp = document.getElementById('logoPreviewAdmin');
-        if(lp) lp.src = LOGO_DATA;
-      }, 100);
-    }
+    // ── Load images separately
+    try{
+      const rawImgs = localStorage.getItem(LS_KEY+'_imgs');
+      if(rawImgs){
+        const imgData = JSON.parse(rawImgs);
+        // Restore product images
+        if(imgData.productImages){
+          imgData.productImages.forEach(pi=>{
+            const p = products.find(x=>x.id==pi.id);
+            if(p && pi.images && pi.images.length) p.images = pi.images;
+          });
+        }
+        // Restore logo
+        if(imgData.LOGO_DATA && imgData.LOGO_DATA.length > 100){
+          LOGO_DATA = imgData.LOGO_DATA;
+        }
+        // Restore anim bg images
+        if(imgData.animBgImages && imgData.animBgImages.length){
+          animConfig.bgImages = imgData.animBgImages;
+        }
+        // Restore custom illustration
+        if(imgData.customIllustration && imgData.customIllustration.length > 50){
+          setTimeout(()=>{
+            const svg = document.getElementById('heroSVG');
+            const customImg = document.getElementById('heroCustomImg');
+            if(svg) svg.style.display = 'none';
+            if(customImg){ customImg.src = imgData.customIllustration; customImg.style.display = 'block'; }
+          }, 200);
+        }
+      }
+    } catch(imgErr){ console.warn('Image load error:', imgErr.message); }
 
-    // Restore WA display
+    // ── Restore logo in header
+    setTimeout(()=>{
+      const hl = document.getElementById('headerLogo');
+      if(hl && LOGO_DATA && LOGO_DATA.length > 100) hl.src = LOGO_DATA;
+      const lp = document.getElementById('logoPreviewAdmin');
+      if(lp && LOGO_DATA && LOGO_DATA.length > 100) lp.src = LOGO_DATA;
+    }, 100);
+
+    // ── Restore WA display
     setTimeout(()=>{
       const waD = document.getElementById('waNumDisplay');
       if(waD && data.waDisplay) waD.textContent = data.waDisplay;
@@ -3262,24 +3319,22 @@ function loadFromStorage(){
       if(waI && data.WA) waI.value = data.WA;
     }, 150);
 
-    // Restore custom illustration
-    if(data.customIllustration && data.customIllustration.length > 50){
-      setTimeout(()=>{
-        const svg = document.getElementById('heroSVG');
-        const customImg = document.getElementById('heroCustomImg');
-        if(svg) svg.style.display = 'none';
-        if(customImg){ customImg.src = data.customIllustration; customImg.style.display = 'block'; }
-      }, 200);
-    }
-
-    // Restore font size
+    // ── Restore font size
     if(data.fontSize && data.fontSize !== 16){
       currentFontSize = data.fontSize;
       setTimeout(()=>{ applyFontSize(data.fontSize); }, 300);
     }
 
-  } catch(e){ console.warn('Storage load error:', e); }
+    if(data.savedAt){
+      console.log('MC-STORE data restored from', new Date(data.savedAt).toLocaleString());
+    }
+
+  } catch(e){ console.error('Storage load error:', e.message); }
 }
+
+// ── Force save on page hide/close
+window.addEventListener('beforeunload', ()=>{ saveToStorage(); });
+window.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') saveToStorage(); });
 
 
 // ═══════════════════════════════════════
@@ -4034,6 +4089,59 @@ function applyThemePreset(name){
 
 function autoSave(){
   saveToStorage();
+}
+
+function forceSaveAll(){
+  saveToStorage();
+  toast('Données sauvegardées ✓');
+  testStorage();
+}
+
+function testStorage(){
+  const box = document.getElementById('storageStatusBox');
+  if(!box) return;
+  try{
+    // Test write
+    localStorage.setItem('mcstore_test', '1');
+    localStorage.removeItem('mcstore_test');
+    // Check what's saved
+    const raw = localStorage.getItem(LS_KEY);
+    const rawImgs = localStorage.getItem(LS_KEY+'_imgs');
+    if(!raw){
+      box.innerHTML = '<span style="color:#FF8888">⚠️ Aucune donnée sauvegardée. Cliquez "Forcer la sauvegarde".</span>';
+      return;
+    }
+    const data = JSON.parse(raw);
+    const savedAt = data.savedAt ? new Date(data.savedAt).toLocaleString('fr-FR') : 'Inconnue';
+    const mainSize = Math.round(raw.length/1024);
+    const imgSize = rawImgs ? Math.round(rawImgs.length/1024) : 0;
+    // Check available space
+    let totalUsed = 0;
+    for(let k in localStorage){ try{ totalUsed += localStorage[k].length; }catch(e){} }
+    const usedKB = Math.round(totalUsed/1024);
+    box.innerHTML = 
+      '<div style="color:#ACF0B4;font-size:14px;margin-bottom:8px">✅ Sauvegarde fonctionnelle !</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px">' +
+      '<div style="color:var(--muted)">Dernière sauvegarde :</div><div style="color:var(--cream)">' + savedAt + '</div>' +
+      '<div style="color:var(--muted)">Produits :</div><div style="color:var(--cream)">' + (data.products||[]).length + '</div>' +
+      '<div style="color:var(--muted)">Commandes :</div><div style="color:var(--cream)">' + (data.orders||[]).length + '</div>' +
+      '<div style="color:var(--muted)">Employés :</div><div style="color:var(--cream)">' + (data.employees||[]).length + '</div>' +
+      '<div style="color:var(--muted)">Données texte :</div><div style="color:var(--cream)">' + mainSize + ' Ko</div>' +
+      '<div style="color:var(--muted)">Images :</div><div style="color:var(--cream)">' + imgSize + ' Ko</div>' +
+      '<div style="color:var(--muted)">Total utilisé :</div><div style="color:' + (usedKB>4000?'#FFD980':'#ACF0B4') + '">' + usedKB + ' Ko / ~5000 Ko</div>' +
+      '</div>';
+  } catch(e){
+    box.innerHTML = '<span style="color:#FF8888">❌ Erreur : ' + e.message + '</span>';
+  }
+}
+
+function clearAllStorage(){
+  if(!confirm('⚠️ Supprimer TOUTES les données sauvegardées (produits, commandes, employés...) ?\nCette action est irréversible !')) return;
+  localStorage.removeItem(LS_KEY);
+  localStorage.removeItem(LS_KEY+'_imgs');
+  localStorage.removeItem(LS_KEY+'_critical');
+  toast('Toutes les données effacées');
+  setTimeout(()=>location.reload(), 1000);
 }
 
 // ═══════════════════════════
