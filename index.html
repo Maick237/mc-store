@@ -2527,7 +2527,7 @@ function doLogout(){
 // PRODUCTS GRID
 // ══════════════════════════════════════
 function renderGrid(list){
-  document.getElementById('prodCount').textContent=list.length+' produit'+(list.length>1?'s':'');
+  setText('prodCount',list.length+' produit'+(list.length>1?'s':''));
   const _pg=gid('productGrid');if(_pg)_pg.innerHTML=list.length
     ?list.map((p,i)=>{
       const avg=getAvgRating(p.reviews);
@@ -2597,22 +2597,22 @@ function filterProds(q){applyFilters();}
 function openDetail(id){
   curDetail=products.find(x=>x.id===id);if(!curDetail)return;
   dQty=1;
-  document.getElementById('dCat').textContent=curDetail.cat;
-  document.getElementById('dName').textContent=curDetail.name;
-  document.getElementById('dDesc').textContent=curDetail.desc;
-  document.getElementById('dQty').textContent=1;
+  setText('dCat',curDetail.cat);
+  setText('dName',curDetail.name);
+  setText('dDesc',curDetail.desc);
+  setText('dQty',1);
   // price
-  document.getElementById('dPrice').textContent=fmt(curDetail.price);
-  document.getElementById('dPriceOld').textContent=curDetail.oldPrice>0?fmt(curDetail.oldPrice):'';
+  setText('dPrice',fmt(curDetail.price));
+  setText('dPriceOld',curDetail.oldPrice>0?fmt(curDetail.oldPrice):'');
   // stars
   const avg=getAvgRating(curDetail.reviews);
-  document.getElementById('dStars').textContent=starsHTML(avg>0?Math.round(avg):5);
+  setText('dStars',starsHTML(avg>0?Math.round(avg):5));
   document.getElementById('dRatingCount').textContent=curDetail.reviews.length>0?`${curDetail.reviews.length} avis`:'Soyez le premier à donner votre avis';
   // specs
   if(curDetail.specs&&curDetail.specs.length){
-    document.getElementById('dSpecs').style.display='block';
+    showEl('dSpecs','block');
     document.getElementById('dSpecsContent').innerHTML=curDetail.specs.map(s=>`<div class="spec-row"><span class="sk">${s.k}</span><span class="sv">${s.v}</span></div>`).join('');
-  } else {document.getElementById('dSpecs').style.display='none';}
+  } else {showEl('dSpecs','none');}
   // meta
   document.getElementById('dMeta').innerHTML=`
     <div class="mrow"><span class="lb">Référence</span><span class="vl">#MC-${String(curDetail.id).padStart(4,'0')}</span></div>
@@ -2626,7 +2626,7 @@ function openDetail(id){
       `<div class="gthumb ${i===0?'active':''}" onclick="switchImg('${img}',this)"><img src="${img}"/></div>`).join('');
   } else {
     m.innerHTML=`<span style="font-size:95px">${curDetail.emoji}</span>`;
-    document.getElementById('gThumbs').innerHTML='';
+    setHTML('gThumbs','');
   }
   const btn=document.getElementById('dAddBtn');
   if(curDetail.stock===0){btn.textContent='Rupture de stock';btn.disabled=true;}
@@ -2641,7 +2641,7 @@ function switchImg(src,el){
   document.querySelectorAll('.gthumb').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
 }
-function changeQty(d){if(!curDetail)return;dQty=Math.max(1,Math.min(curDetail.stock,dQty+d));document.getElementById('dQty').textContent=dQty;}
+function changeQty(d){if(!curDetail)return;dQty=Math.max(1,Math.min(curDetail.stock,dQty+d));setText('dQty',dQty);}
 function addFromDetail(){if(!curDetail||curDetail.stock===0)return;addToCart(curDetail.id,dQty);}
 
 // ══════════════════════════════════════
@@ -2654,14 +2654,14 @@ function submitReview(){
   const comment=document.getElementById('rvComment').value.trim();
   if(!name||!comment){toast('Remplissez votre prénom et votre commentaire');return;}
   curDetail.reviews.unshift({id:Date.now(),name,city:city||'',comment,date:new Date().toLocaleDateString('fr-FR'),likes:0,dislikes:0});
-  document.getElementById('rvName').value='';
-  document.getElementById('rvCity').value='';
-  document.getElementById('rvComment').value='';
+  setVal('rvName','');
+  setVal('rvCity','');
+  setVal('rvComment','');
   renderProductReviews();
   // update stars in detail
   const avg=getAvgRating(curDetail.reviews);
-  document.getElementById('dStars').textContent=starsHTML(avg>0?Math.round(avg):5);
-  document.getElementById('dRatingCount').textContent=`${curDetail.reviews.length} avis`;
+  setText('dStars',starsHTML(avg>0?Math.round(avg):5));
+  setText('dRatingCount',curDetail.reviews.length+' avis');
   toast('Avis publié ✓');autoSave();
 }
 
@@ -2707,8 +2707,8 @@ function submitSiteRating(){
   if(!selectedSiteRating){toast('Choisissez une note en cliquant sur les étoiles');return;}
   if(!name){toast('Entrez votre prénom');return;}
   siteReviews.unshift({name,comment,rating:selectedSiteRating,date:new Date().toLocaleDateString('fr-FR'),likes:0,dislikes:0});
-  document.getElementById('siteRatingName').value='';
-  document.getElementById('siteRatingComment').value='';
+  setVal('siteRatingName','');
+  setVal('siteRatingComment','');
   selectedSiteRating=0;
   document.querySelectorAll('.star-sel-btn').forEach(b=>b.classList.remove('active'));
   renderSiteReviews();
@@ -2768,7 +2768,7 @@ function renderCart(){
   const wrap=document.getElementById('cartBoxWrap');
   if(!keys.length){
     wrap.innerHTML=`<div class="cart-empty"><div class="eicon">🛒</div><p>Votre panier est vide.</p><button class="btn-gold" onclick="goPage('home')">Découvrir les produits</button></div>`;
-    document.getElementById('scRows').innerHTML='';document.getElementById('scTotal').textContent='0 FCFA';return;
+    document.getElementById('scRows').innerHTML='';setText('scTotal','0 FCFA');return;
   }
   wrap.innerHTML=`<div class="cart-box"><div class="cart-box-hdr">Panier (${keys.length} article${keys.length>1?'s':''})</div>`+
     keys.map(id=>{const p=products.find(x=>x.id==id),q=cart[id];return`
@@ -3460,9 +3460,9 @@ function saveProduct(){
 function resetProductForm(){
   ['nName','nCat','nPrice','nOldPrice','nStock','nEmoji','nDesc'].forEach(id=>document.getElementById(id).value='');
   clearVideo();
-  document.getElementById('editingId').value='';
+  setVal('editingId','');
   setText('addFormTitle','Ajouter un produit');
-  document.getElementById('cancelEditBtn').style.display='none';
+  showEl('cancelEditBtn','none');
   newProdImages=[];renderImgPreview();
   editSpecs=[];addSpecRow();
 }
@@ -3478,7 +3478,7 @@ function editProduct(id){
   document.getElementById('nDesc').value=p.desc;
   document.getElementById('editingId').value=id;
   setText('addFormTitle','Modifier le produit');
-  document.getElementById('cancelEditBtn').style.display='inline-flex';
+  showEl('cancelEditBtn','inline-flex');
   editSpecs=[...p.specs];renderSpecRows();
   newProdImages=[...p.images];renderImgPreview();
   window.scrollTo({top:0,behavior:'smooth'});
@@ -3689,7 +3689,7 @@ function renderAdminReviews(){
 }
 
 // ── MODAL ──
-function openModal(html){document.getElementById('modalContent').innerHTML=html;document.getElementById('modalOverlay').classList.add('open');}
+function openModal(html){setHTML('modalContent',html);const _mo=document.getElementById('modalOverlay');if(_mo)_mo.classList.add('open');}
 function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
 
 // ═══════════════════
@@ -3729,7 +3729,7 @@ function handleVideoUpload(e){
 
 function clearVideo(){
   newProdVideoBlob='';newProdVideoFile=null;newProdVideoUrl='';
-  document.getElementById('nVideoUrl').value='';
+  setVal('nVideoUrl','');
   hideEl('videoPreviewWrap');
   document.getElementById('videoPreviewEl').src='';
   setText('videoDurationMsg','');
@@ -3950,7 +3950,7 @@ function saveSettings(){
   const waNum=document.getElementById('waNumInput').value.trim();
   const waDisp=document.getElementById('waDisplayInput').value.trim();
   if(waNum){ WA=waNum; }
-  if(waDisp){ document.getElementById('waNumDisplay').textContent=waDisp; }
+  if(waDisp){ setText('waNumDisplay',waDisp); }
   autoSave();
   toast('Paramètres enregistrés et sauvegardés ✓');
 }
@@ -3962,8 +3962,8 @@ function changePassword(){
   if(p1!==p2){toast('Les mots de passe ne correspondent pas');return;}
   if(p1.length<6){toast('Mot de passe trop court (min 6 caractères)');return;}
   ADMIN_PASS=p1;
-  document.getElementById('newPassInput').value='';
-  document.getElementById('newPassConfirm').value='';
+  setVal('newPassInput','');
+  setVal('newPassConfirm','');
   autoSave();
   toast('Mot de passe changé et sauvegardé ✓');autoSave();
 }
@@ -4461,7 +4461,7 @@ function doEmpLogin(){
   currentEmployee = emp;
   emp.lastLogin = new Date().toLocaleString('fr-FR');
   logActivity(emp.name, "Connexion", "Connexion à l'espace employé");
-  document.getElementById('empLoginErr').textContent = '';
+  setText('empLoginErr','');
   // Setup employee panel
   setText('empPanelTitle','Espace Employé — '+emp.name);
   setText('empPanelSub',emp.role + ' · Connecté le ' + emp.lastLogin);
@@ -4606,10 +4606,10 @@ function empSaveProduct(){
 
 function empResetForm(){
   ['empNName','empNPrice','empNOldPrice','empNStock','empNEmoji','empNDesc'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('empNCat').value='';
-  document.getElementById('empEditingId').value='';
+  setVal('empNCat','');
+  setVal('empEditingId','');
   setText('empAddFormTitle','Ajouter un produit');
-  document.getElementById('empCancelEdit').style.display='none';
+  showEl('empCancelEdit','none');
   empNewImages=[];renderEmpImgPreview();
 }
 
@@ -4624,7 +4624,7 @@ function empEditProduct(id){
   document.getElementById('empNDesc').value=p.desc;
   document.getElementById('empEditingId').value=id;
   setText('empAddFormTitle','Modifier : '+p.name);
-  document.getElementById('empCancelEdit').style.display='inline-flex';
+  showEl('empCancelEdit','inline-flex');
   empNewImages=[...p.images];renderEmpImgPreview();
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -4946,9 +4946,9 @@ function syncSettingsFormToConfig(){
   };
   Object.entries(fields).forEach(([id,val])=>{ const el=document.getElementById(id); if(el)el.value=val; });
   const spEl = document.getElementById('animSpeed');
-  if(spEl){ spEl.value=animConfig.speed; document.getElementById('speedValLabel').textContent=animConfig.speed.toFixed(1); }
+  if(spEl){ spEl.value=animConfig.speed; setText('speedValLabel',animConfig.speed.toFixed(1)); }
   const ctEl = document.getElementById('animCount');
-  if(ctEl){ ctEl.value=animConfig.particleCount; document.getElementById('countValLabel').textContent=animConfig.particleCount; }
+  if(ctEl){ ctEl.value=animConfig.particleCount; setText('countValLabel',animConfig.particleCount); }
   const imgSec = document.getElementById('animImagesSection');
   if(imgSec) imgSec.style.display = animConfig.type==='images' ? 'block' : 'none';
 }
