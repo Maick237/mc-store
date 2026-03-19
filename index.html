@@ -542,6 +542,9 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
   .filter-fab{display:none !important}
 }
 </style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body>
 <canvas id="bgCanvas"></canvas>
@@ -568,10 +571,10 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
       <button class="hn" id="nb-history" onclick="goPage('history')">Mes achats</button>
       <button class="hn" id="nb-orders" onclick="goPage('admin');setTimeout(()=>switchAdminTab('orders'),100)" style="display:none">📋 Commandes <span id="ordersBadge" style="background:var(--gold);color:var(--dark);border-radius:50%;width:17px;height:17px;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;vertical-align:middle">0</span></button>
       <button class="hn" id="nb-admin" onclick="goAdminOrLogin()">Admin</button>
-      <button class="hn" id="nb-emp" onclick="goPage('emp-login')" style="font-size:11px">👤 Employé</button>
+      <button class="hn" id="nb-emp" onclick="goPage('emp-login')" style="display:none;font-size:11px">👤 Employé</button>
     </nav>
     <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()" 
-  style="background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.4);border-radius:var(--r);padding:10px 16px;cursor:pointer;color:var(--gold);font-size:18px;font-weight:700;align-items:center;gap:6px;min-width:44px;min-height:44px">
+  style="background:rgba(245,166,35,0.1);border:2px solid rgba(245,166,35,0.5);border-radius:8px;padding:10px 16px;cursor:pointer;color:var(--gold);font-size:20px;font-weight:700;align-items:center;justify-content:center;min-width:48px;min-height:48px;-webkit-tap-highlight-color:transparent">
   ☰
 </button>
 <div class="hdr-right">
@@ -993,6 +996,14 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
 
     <!-- ORDERS TAB -->
     <div class="admin-section" id="asec-orders">
+      <div style="background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:var(--r);padding:12px 16px;margin-bottom:16px;font-size:13px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:18px">📡</span>
+        <div>
+          <div style="color:var(--cream);font-weight:500">Commandes en temps réel</div>
+          <div style="color:var(--muted);font-size:12px">Les commandes passées depuis n'importe quel appareil vous arrivent via WhatsApp instantanément. Rafraîchissez si vous avez ouvert la boutique sur un autre appareil.</div>
+        </div>
+        <button onclick="syncOrders()" style="background:rgba(245,166,35,0.15);border:1px solid rgba(245,166,35,0.3);border-radius:var(--r);padding:8px 16px;cursor:pointer;color:var(--gold);font-size:12px;font-family:var(--fb);white-space:nowrap">🔄 Synchroniser</button>
+      </div>
       <div id="adminOrdersList"></div>
     </div>
 
@@ -1558,7 +1569,120 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
 </div></div>
 <div class="toast" id="toast"></div>
 
-<script>// ── SAFE DOM HELPERS (prevent null errors)
+<script>// ══════════════════════════════════════════════
+// FIREBASE CONFIG - Sync cross-device
+// ══════════════════════════════════════════════
+// YOUR FIREBASE CONFIG - Replace with yours from Firebase Console
+const FIREBASE_CONFIG = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+let firebaseDB = null;
+let firebaseEnabled = false;
+const SHOP_ID = 'mcstore_maick237'; // Unique shop identifier
+
+function initFirebase(){
+  try{
+    if(typeof firebase === 'undefined'){ console.log('Firebase SDK not loaded'); return; }
+    if(!FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY'){
+      console.log('Firebase not configured yet - using local storage only');
+      return;
+    }
+    const app = firebase.initializeApp(FIREBASE_CONFIG);
+    firebaseDB = firebase.database();
+    firebaseEnabled = true;
+    console.log('✅ Firebase connected - cross-device sync active');
+    startFirebaseSync();
+  } catch(e){
+    console.warn('Firebase init error:', e.message);
+    firebaseEnabled = false;
+  }
+}
+
+function startFirebaseSync(){
+  if(!firebaseDB) return;
+  // Listen for real-time order updates
+  firebaseDB.ref(SHOP_ID+'/orders').on('value', (snapshot)=>{
+    try{
+      const data = snapshot.val();
+      if(data){
+        const firebaseOrders = Object.values(data);
+        // Merge with local orders (avoid duplicates by order number)
+        const existingNums = new Set(orders.map(o=>o.num));
+        let newCount = 0;
+        firebaseOrders.forEach(o=>{
+          if(!existingNums.has(o.num)){
+            orders.unshift(o);
+            newCount++;
+          } else {
+            // Update status if changed
+            const local = orders.find(x=>x.num===o.num);
+            if(local && local.status !== o.status){
+              local.status = o.status;
+            }
+          }
+        });
+        if(newCount > 0){
+          autoSave();
+          updateOrdersBadge();
+          if(isAdmin){
+            showNewOrderNotif(newCount, orders[0]);
+            const sec = document.getElementById('asec-orders');
+            if(sec && sec.classList.contains('active')) renderAdminOrders();
+          }
+        }
+      }
+    } catch(e){ console.warn('Firebase sync error:', e); }
+  });
+
+  // Listen for product updates (admin changes products → all devices see it)
+  firebaseDB.ref(SHOP_ID+'/products').on('value', (snapshot)=>{
+    try{
+      const data = snapshot.val();
+      if(data){
+        const fbProducts = Object.values(data);
+        if(fbProducts.length > 0 && JSON.stringify(fbProducts) !== JSON.stringify(products)){
+          products = fbProducts;
+          renderGrid(products);
+          renderSidebarCats();
+          autoSave();
+        }
+      }
+    } catch(e){}
+  });
+}
+
+function syncOrderToFirebase(order){
+  if(!firebaseDB || !firebaseEnabled) return;
+  try{
+    firebaseDB.ref(SHOP_ID+'/orders/'+order.num.replace('#','')).set(order);
+    console.log('Order synced to Firebase:', order.num);
+  } catch(e){ console.warn('Firebase order sync error:', e); }
+}
+
+function syncProductsToFirebase(){
+  if(!firebaseDB || !firebaseEnabled) return;
+  try{
+    const productsObj = {};
+    products.forEach(p=>{ productsObj['p'+p.id] = {...p, images:[], videoBlob:''}; });
+    firebaseDB.ref(SHOP_ID+'/products').set(productsObj);
+  } catch(e){ console.warn('Firebase products sync error:', e); }
+}
+
+function syncStatusToFirebase(orderNum, status){
+  if(!firebaseDB || !firebaseEnabled) return;
+  try{
+    firebaseDB.ref(SHOP_ID+'/orders/'+orderNum.replace('#','')+'/status').set(status);
+  } catch(e){}
+}
+
+// ── SAFE DOM HELPERS (prevent null errors)
 function gid(id){ return document.getElementById(id); }
 function setText(id,val){ const e=document.getElementById(id); if(e) e.textContent=val; }
 function setHTML(id,val){ const e=document.getElementById(id); if(e) e.innerHTML=val; }
@@ -1919,6 +2043,7 @@ function renderPaymentOptions(){
 function showAdminNav(){
   const nbo=document.getElementById('nb-orders');if(nbo)nbo.style.display='flex';
   const nba=document.getElementById('nb-admin');if(nba)nba.textContent='⚙️ Admin';
+  const nbe=document.getElementById('nb-emp');if(nbe)nbe.style.display='flex';
   updateOrdersBadge();
   startOrderPolling();
   requestNotificationPermission();
@@ -1927,6 +2052,7 @@ function showAdminNav(){
 function hideAdminNav(){
   const nbo=document.getElementById('nb-orders');if(nbo)nbo.style.display='none';
   const nba=document.getElementById('nb-admin');if(nba)nba.textContent='Admin';
+  const nbe=document.getElementById('nb-emp');if(nbe)nbe.style.display='none';
 }
 
 function updateOrdersBadge(){
@@ -2401,15 +2527,17 @@ function confirmOrder(){
   const payLabel=plabels[selPayment]||'Non spécifié';
   const items=keys.map(id=>{const p=products.find(x=>x.id==id);return{id:p.id,emoji:p.emoji,name:p.name,cat:p.cat,qty:cart[id],price:p.price,total:p.price*cart[id]};});
   keys.forEach(id=>{const p=products.find(x=>x.id==id);if(p)p.stock=Math.max(0,p.stock-cart[id]);});
-  // Tag order with client session ID
-  let clientId = sessionStorage.getItem('mcstore_client_id');
+  // Tag order with persistent client ID (same device = same orders)
+  let clientId = localStorage.getItem('mcstore_my_client_id');
   if(!clientId){
     clientId = 'client_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
-    sessionStorage.setItem('mcstore_client_id', clientId);
+    localStorage.setItem('mcstore_my_client_id', clientId);
   }
+  sessionStorage.setItem('mcstore_client_id', clientId);
   const order={num,date:new Date().toLocaleDateString('fr-FR'),items,subtotal:sub,discount:disc,total:tot,payment:payLabel,coupon:appliedCoupon?appliedCoupon.code:'',delivery:{name:fn+' '+ln,phone:ph,city:ct,address:ad,note:document.getElementById('note').value||''},status:'Confirmée',clientId};
   orders.unshift(order);lastOrder=order;
   sendWAOrder(order);
+  syncOrderToFirebase(order); // Sync to Firebase for cross-device
   cart={};appliedCoupon=null;updateBadge();
   if(isAdmin)updateOrdersBadge();
   autoSave();
@@ -2752,13 +2880,18 @@ function downloadLastInvoice(){if(lastOrder)generateInvoicePDF(lastOrder);else t
 // ══════════════════════════════════════
 function renderHistory(){
   const w=document.getElementById('historyList');
-  // Get this client's session ID (unique per browser session)
+  // Get this client's session ID (unique per browser/device)
   let clientId = sessionStorage.getItem('mcstore_client_id');
   if(!clientId){
-    clientId = 'client_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+    // Check localStorage for persistent clientId (same device, new session)
+    clientId = localStorage.getItem('mcstore_my_client_id');
+    if(!clientId){
+      clientId = 'client_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+      localStorage.setItem('mcstore_my_client_id', clientId);
+    }
     sessionStorage.setItem('mcstore_client_id', clientId);
   }
-  // Show only orders that match this client's session
+  // Show only orders that match this client's device
   const myOrders = orders.filter(o => o.clientId === clientId);
   if(!myOrders.length){
     w.innerHTML=`<div style="text-align:center;padding:60px 20px">
@@ -3088,8 +3221,31 @@ function renderAdminOrders(){
   w.innerHTML = statsBar + orderCards;
 }
 
+function syncOrders(){
+  // Reload orders from localStorage (catches orders from other tabs/devices on same browser)
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){
+      const data = JSON.parse(raw);
+      if(data.orders && data.orders.length >= orders.length){
+        orders = data.orders;
+        renderAdminOrders();
+        updateOrdersBadge();
+        toast('Commandes synchronisées ✓');
+      } else {
+        toast('Aucune nouvelle commande');
+      }
+    }
+  } catch(e){ toast('Erreur de synchronisation'); }
+}
+
 function updateOrderStatus(i, newStatus){
-  if(orders[i]){ orders[i].status = newStatus; toast('Statut mis à jour : '+newStatus); autoSave(); }
+  if(orders[i]){
+    orders[i].status = newStatus;
+    syncStatusToFirebase(orders[i].num, newStatus);
+    toast('Statut mis à jour : '+newStatus);
+    autoSave();
+  }
 }
 
 function deleteOrder(i){
@@ -4383,6 +4539,24 @@ function clearAllStorage(){
   } catch(e){}
 })();
 
+// ── RESTORE LOGO FIRST (before render - same on all devices)
+(function(){
+  try{
+    const savedLogo = localStorage.getItem('mcstore_logo_data');
+    if(savedLogo && savedLogo.length > 100){
+      LOGO_DATA = savedLogo;
+      // Apply immediately to header
+      document.addEventListener('DOMContentLoaded', function(){
+        const hl = document.getElementById('headerLogo');
+        if(hl) hl.src = savedLogo;
+      });
+      // Also try right now
+      const hl = document.getElementById('headerLogo');
+      if(hl) hl.src = savedLogo;
+    }
+  } catch(e){}
+})();
+
 // ── RESTORE TEXT SETTINGS (before render - no flash)
 (function(){
   try{
@@ -4432,6 +4606,7 @@ window.addEventListener('resize', ()=>{
   if(mab) mab.style.display = window.innerWidth <= 768 ? 'block' : 'none';
 });
 
+initFirebase();
 loadFromStorage();
 loadPaymentModes();
 renderGrid(products);
