@@ -8,7 +8,15 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="apple-mobile-web-app-title" content="MC-STORE"/>
   <meta name="theme-color" content="#F5A623"/>
-<title>MC-STORE — Les bonnes trouvailles, au bon moment.</title>
+<title>MC-STORE Cameroun — Boutique en ligne | Livraison Douala</title>
+  <meta name="description" content="MC-STORE : votre boutique en ligne au Cameroun. Mode, électronique, beauté, maison. Livraison rapide à Douala et partout au Cameroun. Paiement Orange Money et MTN MoMo."/>
+  <meta name="keywords" content="boutique en ligne Cameroun, achat en ligne Douala, MC-STORE, Orange Money, MTN MoMo, livraison Cameroun"/>
+  <meta property="og:title" content="MC-STORE — Les bonnes trouvailles, au bon moment"/>
+  <meta property="og:description" content="Boutique en ligne au Cameroun. Mode, électronique, beauté. Livraison rapide, paiement Mobile Money."/>
+  <meta property="og:url" content="https://Maick237.github.io/mc-store/"/>
+  <meta property="og:type" content="website"/>
+  <meta name="robots" content="index, follow"/>
+  <link rel="canonical" href="https://Maick237.github.io/mc-store/"/>
 <meta name="description" content="MC-STORE — Les bonnes trouvailles, au bon moment. Boutique en ligne au Cameroun. Mode, électronique, beauté, maison et plus. Livraison disponible."/>
 <meta name="keywords" content="MC-STORE, boutique en ligne, Cameroun, acheter en ligne, livraison Cameroun, mode, électronique"/>
 <meta name="robots" content="index, follow"/>
@@ -553,9 +561,6 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
 .admin-only-btn{display:none !important}
 .admin-logged-in .admin-only-btn{display:flex !important}
 </style>
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body>
 <canvas id="bgCanvas"></canvas>
@@ -642,7 +647,10 @@ body{font-family:var(--fb);background:var(--dark);color:var(--cream);min-height:
     <div id="featured-videos-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px"></div>
   </div>
 
-  <div id="promo-bar" style="display:none" class="promo-banner">
+  <!-- Firebase status bar -->
+  <div id="firebase-status" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9000;padding:6px 16px;font-size:11px;font-weight:500;text-align:center;font-family:var(--fb)"></div>
+
+  <div id="promo-bar"  style="display:none" class="promo-banner">
     <div class="pb-text">🎉 Promotions actives — Utilisez un code promo au panier pour bénéficier de réductions !</div>
   </div>
 
@@ -1942,20 +1950,57 @@ function initLang(){
 
 function initFirebase(){
   try{
-    if(typeof firebase === 'undefined'){ console.log('Firebase SDK not loaded'); return; }
-    if(!FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey === 'AIzaSyBj4Qd4fHfFBx152lWnL3CvkNpC8yZpl5o'){
-      console.log('Firebase not configured yet - using local storage only');
+    if(typeof firebase === 'undefined'){
+      console.warn('Firebase SDK not loaded - check internet connection');
       return;
     }
-    const app = firebase.initializeApp(FIREBASE_CONFIG);
+    if(!FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey === '' || FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY'){
+      console.log('Firebase not configured - using local storage only');
+      return;
+    }
+    // Check if already initialized
+    try{
+      firebase.app(); // throws if not initialized
+      console.log('Firebase already initialized');
+    } catch(e){
+      firebase.initializeApp(FIREBASE_CONFIG);
+    }
     firebaseDB = firebase.database();
     firebaseEnabled = true;
-    console.log('✅ Firebase connected - cross-device sync active');
+    console.log('%c✅ Firebase connected - sync active', 'color:green;font-weight:bold');
+    const statusBar = document.getElementById('firebase-status');
+    if(statusBar){
+      statusBar.style.display='block';
+      statusBar.style.background='rgba(39,174,96,0.15)';
+      statusBar.style.color='#ACF0B4';
+      statusBar.textContent='🟢 Synchronisation active — téléphone et ordinateur liés';
+      setTimeout(()=>statusBar.style.display='none', 4000);
+    }
     startFirebaseSync();
+    syncProductsFromFirebase();
   } catch(e){
     console.warn('Firebase init error:', e.message);
     firebaseEnabled = false;
   }
+}
+
+function syncProductsFromFirebase(){
+  if(!firebaseDB) return;
+  // Pull products from Firebase when app starts
+  firebaseDB.ref(SHOP_ID+'/products').once('value').then(snapshot=>{
+    const data = snapshot.val();
+    if(data){
+      const fbProds = Object.values(data).filter(p=>p&&p.id);
+      if(fbProds.length > 0){
+        // Merge: Firebase products win (they're the source of truth)
+        products = fbProds;
+        renderGrid(products);
+        renderSidebarCats();
+        autoSave();
+        console.log('Products loaded from Firebase:', fbProds.length);
+      }
+    }
+  }).catch(e=>console.warn('Products sync error:', e.message));
 }
 
 function startFirebaseSync(){
@@ -2023,9 +2068,17 @@ function syncProductsToFirebase(){
   if(!firebaseDB || !firebaseEnabled) return;
   try{
     const productsObj = {};
-    products.forEach(p=>{ productsObj['p'+p.id] = {...p, images:[], videoBlob:''}; });
-    firebaseDB.ref(SHOP_ID+'/products').set(productsObj);
-  } catch(e){ console.warn('Firebase products sync error:', e); }
+    products.forEach(p=>{
+      productsObj['p'+p.id] = {
+        ...p,
+        images: p.images ? p.images.slice(0,2) : [], // max 2 images to avoid size limit
+        videoBlob: ''
+      };
+    });
+    firebaseDB.ref(SHOP_ID+'/products').set(productsObj)
+      .then(()=>console.log('Products synced to Firebase ✅'))
+      .catch(e=>console.warn('Sync error:', e.message));
+  } catch(e){ console.warn('Firebase products sync error:', e.message); }
 }
 
 function syncStatusToFirebase(orderNum, status){
